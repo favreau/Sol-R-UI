@@ -193,6 +193,8 @@ Function RayTracer_SetPostProcessingInfo(
 
 Function RayTracer_SetDraftMode(draft: integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
+Function RayTracer_GenerateScreenshot(filename: AnsiString; quality: integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
+
 Function RayTracer_InitializeKernel( activeLogging: boolean; platform : Integer;device : integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 Function RayTracer_FinalizeKernel : Integer; cdecl; external RAYTRACERMODULE_DLL;
 Function RayTracer_ResetKernel : Integer; cdecl; external RAYTRACERMODULE_DLL;

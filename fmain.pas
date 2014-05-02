@@ -165,6 +165,8 @@ type
     lblDevices: TLabel;
     cbDevices: TComboBox;
     cbDraftMode: TCheckBox;
+    miScreenshot: TMenuItem;
+    N2: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -229,6 +231,7 @@ type
     procedure cbDoubleSidedTrianglesClick(Sender: TObject);
     procedure cbPlatformsChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure miScreenshotClick(Sender: TObject);
   private
     { Private declarations }
     pathTracingIteration : integer;
@@ -562,7 +565,7 @@ end;
 
 procedure TmainForm.Initialize;
 begin
-  maxPathTracingIterations := 20;
+  maxPathTracingIterations := 5;
   F3DBitmap := TBitmap.Create;
   F3DBitmap.Width  := img3DView.Width;
   F3DBitmap.Height := img3DView.Height;
@@ -659,6 +662,15 @@ begin
     miSaveAsClick(sender)
   else
     RayTracer_SaveToFile(currentModel.Filename);
+end;
+
+procedure TmainForm.miScreenshotClick(Sender: TObject);
+begin
+  sdSaveFile.Filter:='Bitmap file|*.bmp';
+  if sdSaveFile.Execute then
+  begin
+    RayTracer_GenerateScreenshot(sdSaveFile.FileName,sbRayInterations.Position);
+  end;
 end;
 
 procedure TmainForm.FormCreate(Sender: TObject);

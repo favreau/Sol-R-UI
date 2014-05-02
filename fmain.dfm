@@ -8035,8 +8035,6 @@ object mainForm: TmainForm
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseMove = pnlCenterMouseMove
-    ExplicitTop = 0
-    ExplicitHeight = 670
     object img3DView: TImage
       Left = 5
       Top = 6
@@ -8054,7 +8052,6 @@ object mainForm: TmainForm
       Height = 147
       Align = alBottom
       TabOrder = 0
-      ExplicitTop = 522
       object lblPathTracingIterations: TLabel
         Left = 5
         Top = 29
@@ -8074,7 +8071,7 @@ object mainForm: TmainForm
         Caption = '0 elements'
       end
       object lblPrimitiveID: TLabel
-        Left = 423
+        Left = 415
         Top = 29
         Width = 53
         Height = 13
@@ -8114,21 +8111,17 @@ object mainForm: TmainForm
     Height = 658
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 0
-    ExplicitHeight = 670
     object pgParameters: TPageControl
       Left = 1
       Top = 1
       Width = 237
       Height = 656
-      ActivePage = tsScene
+      ActivePage = tsControls
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 606
       object tsControls: TTabSheet
         Caption = 'Controls'
         ImageIndex = 3
-        ExplicitHeight = 640
         object rgMouseControls: TRadioGroup
           AlignWithMargins = True
           Left = 3
@@ -8285,7 +8278,6 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
-        ExplicitHeight = 640
         object GroupBox4: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -8476,7 +8468,6 @@ object mainForm: TmainForm
             'Antialiasing')
           TabOrder = 3
           OnClick = rgMiscClick
-          ExplicitTop = 362
         end
         object GroupBox1: TGroupBox
           Left = 0
@@ -8605,7 +8596,6 @@ object mainForm: TmainForm
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
-        ExplicitHeight = 640
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -8881,7 +8871,6 @@ object mainForm: TmainForm
           Align = alClient
           Caption = 'Textures'
           TabOrder = 2
-          ExplicitHeight = 276
           object Label40: TLabel
             Left = 16
             Top = 144
@@ -9043,7 +9032,6 @@ object mainForm: TmainForm
       object tsObject: TTabSheet
         Caption = 'Object'
         ImageIndex = 2
-        ExplicitHeight = 640
         object gbCoordinates: TGroupBox
           Left = 0
           Top = 0
@@ -9353,6 +9341,14 @@ object mainForm: TmainForm
         OnClick = miSaveAsClick
       end
       object N1: TMenuItem
+        Caption = '-'
+      end
+      object miScreenshot: TMenuItem
+        Caption = 'Screenshot'
+        ShortCut = 16464
+        OnClick = miScreenshotClick
+      end
+      object N2: TMenuItem
         Caption = '-'
       end
       object Exit1: TMenuItem

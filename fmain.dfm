@@ -8596,6 +8596,10 @@ object mainForm: TmainForm
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -9032,6 +9036,10 @@ object mainForm: TmainForm
       object tsObject: TTabSheet
         Caption = 'Object'
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object gbCoordinates: TGroupBox
           Left = 0
           Top = 0

@@ -565,7 +565,7 @@ end;
 
 procedure TmainForm.Initialize;
 begin
-  maxPathTracingIterations := 5;
+  maxPathTracingIterations := 10;
   F3DBitmap := TBitmap.Create;
   F3DBitmap.Width  := img3DView.Width;
   F3DBitmap.Height := img3DView.Height;
@@ -666,10 +666,10 @@ end;
 
 procedure TmainForm.miScreenshotClick(Sender: TObject);
 begin
-  sdSaveFile.Filter:='Bitmap file|*.bmp';
+  sdSaveFile.Filter:='JPG file|*.jpg';
   if sdSaveFile.Execute then
   begin
-    RayTracer_GenerateScreenshot(sdSaveFile.FileName,sbRayInterations.Position);
+    RayTracer_GenerateScreenshot(sdSaveFile.FileName,1);
   end;
 end;
 

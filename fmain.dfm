@@ -8367,8 +8367,9 @@ object mainForm: TmainForm
             Top = 74
             Width = 114
             Height = 17
+            Max = 200
             PageSize = 0
-            Position = 100
+            Position = 200
             TabOrder = 1
             OnChange = sbViewDistanceChange
           end
@@ -8514,9 +8515,9 @@ object mainForm: TmainForm
             Width = 122
             Height = 21
             Style = csDropDownList
-            ItemIndex = 0
+            ItemIndex = 1
             TabOrder = 0
-            Text = 'None'
+            Text = 'Wall'
             OnChange = cbSceneChange
             Items.Strings = (
               'None'
@@ -8596,10 +8597,6 @@ object mainForm: TmainForm
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -8781,36 +8778,36 @@ object mainForm: TmainForm
             Caption = 'Noise:'
           end
           object lblReflectionValue: TLabel
-            Left = 200
-            Top = 24
-            Width = 12
+            Left = 174
+            Top = 27
+            Width = 21
             Height = 13
-            Caption = '00'
+            Caption = '0.00'
           end
-          object Label11: TLabel
-            Left = 199
+          object lblTransparencyValue: TLabel
+            Left = 174
             Top = 47
-            Width = 12
+            Width = 21
             Height = 13
-            Caption = '00'
+            Caption = '0.00'
           end
-          object Label12: TLabel
-            Left = 199
+          object lblRefractionValue: TLabel
+            Left = 174
             Top = 71
-            Width = 12
+            Width = 21
             Height = 13
-            Caption = '00'
+            Caption = '0.00'
           end
-          object Label13: TLabel
-            Left = 199
+          object lblNoiseValue: TLabel
+            Left = 174
             Top = 95
-            Width = 12
+            Width = 21
             Height = 13
-            Caption = '00'
+            Caption = '0.00'
           end
           object cbProcedural: TCheckBox
             Left = 137
-            Top = 130
+            Top = 119
             Width = 73
             Height = 17
             Caption = 'Procedural'
@@ -8820,7 +8817,7 @@ object mainForm: TmainForm
           object sbReflection: TScrollBar
             Left = 88
             Top = 24
-            Width = 105
+            Width = 80
             Height = 17
             PageSize = 0
             TabOrder = 1
@@ -8829,7 +8826,7 @@ object mainForm: TmainForm
           object sbTransparency: TScrollBar
             Left = 88
             Top = 48
-            Width = 105
+            Width = 80
             Height = 17
             PageSize = 0
             TabOrder = 2
@@ -8838,7 +8835,7 @@ object mainForm: TmainForm
           object sbRefraction: TScrollBar
             Left = 88
             Top = 72
-            Width = 105
+            Width = 80
             Height = 17
             Max = 500
             Min = -100
@@ -8849,7 +8846,7 @@ object mainForm: TmainForm
           object sbNoise: TScrollBar
             Left = 88
             Top = 96
-            Width = 105
+            Width = 80
             Height = 17
             PageSize = 0
             TabOrder = 4
@@ -8857,13 +8854,22 @@ object mainForm: TmainForm
           end
           object cbFastTransparency: TCheckBox
             Left = 16
-            Top = 130
+            Top = 119
             Width = 115
             Height = 18
             Caption = 'Fast Transparency'
             Checked = True
             State = cbChecked
             TabOrder = 5
+            OnClick = cbFastTransparencyClick
+          end
+          object cbCastShadows: TCheckBox
+            Left = 16
+            Top = 139
+            Width = 115
+            Height = 18
+            Caption = 'Cast shadows'
+            TabOrder = 6
             OnClick = cbFastTransparencyClick
           end
         end
@@ -8885,16 +8891,16 @@ object mainForm: TmainForm
           object lblTransparencyId: TLabel
             Left = 199
             Top = 146
-            Width = 12
+            Width = 6
             Height = 13
-            Caption = '00'
+            Caption = '0'
           end
           object lblReflectionId: TLabel
             Left = 199
             Top = 123
-            Width = 12
+            Width = 6
             Height = 13
-            Caption = '00'
+            Caption = '0'
           end
           object Label39: TLabel
             Left = 16
@@ -8934,30 +8940,30 @@ object mainForm: TmainForm
           object lblNormalId: TLabel
             Left = 199
             Top = 77
-            Width = 12
+            Width = 6
             Height = 13
-            Caption = '00'
+            Caption = '0'
           end
           object lblSpecularId: TLabel
             Left = 199
             Top = 100
-            Width = 12
+            Width = 6
             Height = 13
-            Caption = '00'
+            Caption = '0'
           end
           object lblBumpId: TLabel
             Left = 199
             Top = 54
-            Width = 12
+            Width = 6
             Height = 13
-            Caption = '00'
+            Caption = '0'
           end
           object lblDiffuseId: TLabel
             Left = 199
             Top = 30
-            Width = 12
+            Width = 6
             Height = 13
-            Caption = '00'
+            Caption = '0'
           end
           object sbTransparencyTextureId: TScrollBar
             Left = 88
@@ -9036,10 +9042,6 @@ object mainForm: TmainForm
       object tsObject: TTabSheet
         Caption = 'Object'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gbCoordinates: TGroupBox
           Left = 0
           Top = 0

@@ -134,9 +134,9 @@ type
     edtMoleculeId: TMaskEdit;
     lblPrimitiveID: TLabel;
     lblReflectionValue: TLabel;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label13: TLabel;
+    lblTransparencyValue: TLabel;
+    lblRefractionValue: TLabel;
+    lblNoiseValue: TLabel;
     gbTextureIds: TGroupBox;
     Label40: TLabel;
     lblTransparencyId: TLabel;
@@ -167,6 +167,7 @@ type
     cbDraftMode: TCheckBox;
     miScreenshot: TMenuItem;
     N2: TMenuItem;
+    cbCastShadows: TCheckBox;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -433,6 +434,7 @@ var
   specularTextureId: integer;
   reflectionTextureId: integer;
   transparencyTextureId: integer;
+  wireFrame: boolean;
 begin
   controlUpdate := false;
   currentMaterial := -1;
@@ -458,6 +460,7 @@ begin
     specular.y := 50;
     specular.z := 0;
     fastTransparency := false;
+    wireFrame := false;
 
     r := 0.5+random(40)/100;
     g := 0.5+random(40)/100;
@@ -516,6 +519,13 @@ begin
       CORNELLBOX_BACK_MATERIAL : begin r:=92/255;  g:=93/255;  b:=150/255; end;
       CORNELLBOX_LEFT_MATERIAL : begin r:=92/255;  g:=150/255; b:=93/255; end;
 
+      SKYBOX_FRONT_MATERIAL : begin diffuseTextureId:=0; wireFrame:=true; end;
+      SKYBOX_LEFT_MATERIAL  : begin diffuseTextureId:=1; wireFrame:=true; end;
+      SKYBOX_BACK_MATERIAL  : begin diffuseTextureId:=2; wireFrame:=true; end;
+      SKYBOX_RIGHT_MATERIAL : begin diffuseTextureId:=3; wireFrame:=true; end;
+      SKYBOX_TOP_MATERIAL   : begin diffuseTextureId:=4; wireFrame:=true; end;
+      SKYBOX_BOTTOM_MATERIAL: begin diffuseTextureId:=5; wireFrame:=true; end;
+
       // Fractals
       MANDELBROT_MATERIAL: begin r:=127/255; g:=127/255; b:=127/255; diffuseTextureId:=TEXTURE_MANDELBROT; end;
       JULIA_MATERIAL     : begin r:=154/255; g:=94/255;  b:=64/255;  diffuseTextureId:=TEXTURE_JULIA; end;
@@ -552,7 +562,7 @@ begin
       reflection,
       refraction,
       integer(procedural),
-      0, 0,
+      integer(wireFrame), 1,
       transparency,
       diffuseTextureId,normalTextureId,bumpTextureId,specularTextureId,
       reflectionTextureId,transparencyTextureId,
@@ -669,7 +679,7 @@ begin
   sdSaveFile.Filter:='JPG file|*.jpg';
   if sdSaveFile.Execute then
   begin
-    RayTracer_GenerateScreenshot(sdSaveFile.FileName,1);
+    RayTracer_GenerateScreenshot(AnsiString(sdSaveFile.FileName),1);
   end;
 end;
 
@@ -730,42 +740,56 @@ end;
 
 procedure TmainForm.updateMaterial;
 var
+  material: TMaterial;
   fastTransparency: integer;
 begin
   if( not controlUpdate ) and ( currentMaterial <> -1 ) then
   begin
     if( cbFastTransparency.Checked ) then fastTransparency := 1 else fastTransparency := 0;
     pathTracingIteration := 0;
+    material.color.x := GetRValue(shMaterialColor.Brush.Color)/255;
+    material.color.y := GetGValue(shMaterialColor.Brush.Color)/255;
+    material.color.z := GetBValue(shMaterialColor.Brush.Color)/255;
+    material.noise   := sbNoise.Position/100;
+    material.reflection := sbReflection.Position/100;
+    material.refraction := 1+sbRefraction.Position/100;
+    material.procedural := integer(cbProcedural.checked);
+    material.wireframe  := integer(not cbCastShadows.Checked);
+    material.wireframeDepth := 0;
+    material.transparency:= sbTransparency.Position/100;
+    material.diffuseTextureId:=sbDiffuseTextureId.Position;
+    material.normalTextureId:=sbNormalTextureId.Position;
+    material.bumpTextureId:=sbBumpTextureId.Position;
+    material.specularTextureId:=sbSpecularTextureId.Position;
+    material.reflectionTextureId:=sbReflectionTextureId.Position;
+    material.transparencyTextureId:=sbTransparencyTextureId.Position;
+    material.specular.x:=sbSpecValue.Position/100;
+    material.specular.y:=sbSpecPower.Position;
+    material.specular.z:=sbSpecCoef.Position/100;
+    material.innerIllumination:=sbInnerIllumination.Position/100;
+    material.illuminationDiffusion:=sbIlluminationDiffusion.Position*5000;
+    material.illuminationPropagation:=sbIlluminationPropagation.Position*5000;
+    material.fastTransparency:=fastTransparency;
+
     RayTracer_SetMaterial(
       currentMaterial,
-      GetRValue(shMaterialColor.Brush.Color)/255,
-      GetGValue(shMaterialColor.Brush.Color)/255,
-      GetBValue(shMaterialColor.Brush.Color)/255,
-      sbNoise.Position/100,
-      sbReflection.Position/100,
-      1+sbRefraction.Position/100,
-      integer(cbProcedural.checked),
-      0, 0,
-      sbTransparency.Position/100,
-      sbDiffuseTextureId.Position,
-      sbNormalTextureId.Position,
-      sbBumpTextureId.Position,
-      sbSpecularTextureId.Position,
-      sbReflectionTextureId.Position,
-      sbTransparencyTextureId.Position,
-      sbSpecValue.Position/100,
-      sbSpecPower.Position,
-      sbSpecCoef.Position/100,
-      sbInnerIllumination.Position/100,
-      sbIlluminationDiffusion.Position*5000,
-      sbIlluminationPropagation.Position*5000,
-      fastTransparency );
-    lblDiffuseId.Caption := IntToStr(sbDiffuseTextureId.Position);
-    lblBumpId.Caption := IntToStr(sbBumpTextureId.Position);
-    lblNormalId.Caption := IntToStr(sbNormalTextureId.Position);
-    lblSpecularId.Caption := IntToStr(sbSpecularTextureId.Position);
-    lblReflectionId.Caption := IntToStr(sbReflectionTextureId.Position);
-    lblTransparencyId.Caption := IntToStr(sbTransparencyTextureId.Position);
+      material.color.x,material.color.y,material.color.z,
+      material.noise,
+      material.reflection,
+      material.refraction,
+      material.procedural,
+      material.wireframe, material.wireframeDepth,
+      material.transparency,
+      material.diffuseTextureId,
+      material.normalTextureId,
+      material.bumpTextureId,
+      material.specularTextureId,
+      material.reflectionTextureId,
+      material.transparencyTextureId,
+      material.specular.x,material.specular.y,material.specular.z,
+      material.innerIllumination,material.illuminationDiffusion,material.illuminationPropagation,
+      material.fastTransparency );
+    setMaterialControls(material);
     updateScene;
   end;
 end;
@@ -793,7 +817,7 @@ begin
       maxPathTracingIterations,
       integer(ot_Delphi),
       random(1000),
-      1,
+      0,
       rgMisc.ItemIndex,
       integer(cbDoubleSidedTriangles.Checked),
       integer(cbGradientBackGround.Checked),
@@ -1197,89 +1221,186 @@ begin
     1: // Wall
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive(
-        primitiveId,
-        -boxSize, -boxSize, boxSize,
-         boxSize, -boxSize, boxSize,
-         boxSize,  boxSize, boxSize,
-         0,0,0,
-        CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, -boxSize, -boxSize, boxSize, boxSize, -boxSize, boxSize, boxSize,  boxSize, boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,1,0,1,1,0);
+
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive(
-        primitiveId,
-         boxSize,  boxSize, boxSize,
-        -boxSize,  boxSize, boxSize,
-        -boxSize, -boxSize, boxSize,
-         0,0,0,
-        CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId,  boxSize,  boxSize, boxSize,-boxSize,  boxSize, boxSize,-boxSize, -boxSize, boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0,0,0,0);
     end;
     2: // Water ball
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptSphere));
-      RayTracer_SetPrimitive(
-        primitiveId,
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        boxSize/2, boxSize/2, boxSize/2,
-        CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
     end;
     3: // Ground
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive(
-        primitiveId,
-        -boxSize, groundHeight, -boxSize,
-         boxSize, groundHeight, -boxSize,
-         boxSize, groundHeight,  boxSize,
-         0,0,0,
-        CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive(
-        primitiveId,
-         boxSize, groundHeight,  boxSize,
-        -boxSize, groundHeight,  boxSize,
-        -boxSize, groundHeight, -boxSize,
-         0,0,0,
-        CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
     end;
     4: // Cornell Box
     begin
-      size := 10000;
-      primitiveId := RayTracer_AddPrimitive(integer(ptXYPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, groundHeight + size, size, 0,0,0,0,0,0, size, size,  0, 107); // front
-      primitiveId := RayTracer_AddPrimitive(integer(ptYZPlane));
-      RayTracer_SetPrimitive(primitiveId, size, groundHeight + size, 0, 0,0,0,0,0,0, 0, size, size, 108); // right
-      primitiveId := RayTracer_AddPrimitive(integer(ptYZPlane));
-      RayTracer_SetPrimitive(primitiveId,-size, groundHeight + size, 0, 0,0,0,0,0,0, 0, size, size, 109); // left
-      primitiveId := RayTracer_AddPrimitive(integer(ptXZPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, groundHeight+size + size, 0, 0,0,0,0,0,0, size,  0, size, 110); // Roof
-      primitiveId := RayTracer_AddPrimitive(integer(ptXZPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, groundHeight-size + size, 0,0,0,0,0,0,0,  size,  0, size, 109); // Floor
+      boxSize := 10000;
+      // Ground
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+
+      groundHeight := groundHeight+boxSize;
+      // Front
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      // Right
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      {
+      // Back
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      }
+
+      // Left
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      // Top
+      // Ground
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
     end;
     5: // SkyBox
     begin
-      size := 100000;
-      primitiveId := RayTracer_AddPrimitive(integer(ptXYPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, 0, size, 0,0,0,0,0,0, size, size,  0, 101); // front
-      primitiveId := RayTracer_AddPrimitive(integer(ptYZPlane));
-      RayTracer_SetPrimitive(primitiveId, size, 0, 0, 0,0,0,0,0,0, 0, size, size, 102); // right
-      primitiveId := RayTracer_AddPrimitive(integer(ptXYPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, 0,-size, 0,0,0,0,0,0, size, size,  0, 103); // back
-      primitiveId := RayTracer_AddPrimitive(integer(ptYZPlane));
-      RayTracer_SetPrimitive(primitiveId,-size, 0, 0, 0,0,0,0,0,0, 0, size, size, 104); // left
-      primitiveId := RayTracer_AddPrimitive(integer(ptXZPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, size, 0, 0,0,0,0,0,0, size,  0, size, 105); // Roof
-      primitiveId := RayTracer_AddPrimitive(integer(ptXZPlane));
-      RayTracer_SetPrimitive(primitiveId, 0, -size, 0,0,0,0,0,0,0,  size,  0, size, 106); // Floor
+      boxSize := 5000;
+      tiles:=4;
+      // Ground
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+
+      boxSize := 25000;
+      // Front
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, SKYBOX_FRONT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, SKYBOX_FRONT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      // Right
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, SKYBOX_RIGHT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, SKYBOX_RIGHT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      // Back
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, SKYBOX_BACK_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight-boxSize,-boxSize, 0,0,0, SKYBOX_BACK_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      // Left
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, SKYBOX_LEFT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, SKYBOX_LEFT_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+
+      // Top
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight+boxSize, -boxSize, boxSize, groundHeight+boxSize,-boxSize, boxSize, groundHeight+boxSize,  boxSize, 0,0,0, SKYBOX_TOP_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,1,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight+boxSize, boxSize, -boxSize, groundHeight+boxSize, boxSize, -boxSize, groundHeight+boxSize,-boxSize, 0,0,0, SKYBOX_TOP_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0,0,0,0);
+
+      // Bottom
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight-boxSize, -boxSize, boxSize, groundHeight-boxSize,-boxSize, boxSize, groundHeight-boxSize,  boxSize, 0,0,0, SKYBOX_BOTTOM_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,1,0,1,1,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight-boxSize, boxSize, -boxSize, groundHeight-boxSize, boxSize, -boxSize, groundHeight-boxSize,-boxSize, 0,0,0, SKYBOX_BOTTOM_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0,0,0,0);
     end;
   end;
 
@@ -1482,6 +1603,20 @@ begin
   sbBumpTextureId.Position := material.bumpTextureId;
   sbNormalTextureId.Position := material.normalTextureId;
   sbSpecularTextureId.Position := material.specularTextureId;
+  cbCastShadows.Checked := (material.wireframe=0);
+
+  // Labels
+  lblReflectionValue.Caption := FloatToStrF(material.reflection,ffNumber,1,2);
+  lblTransparencyValue.Caption := FloatToStrF(material.transparency,ffNumber,1,2);
+  lblRefractionValue.Caption := FloatToStrF(material.refraction,ffNumber,1,2);
+  lblNoiseValue.Caption := FloatToStrF(material.noise,ffNumber,1,2);
+
+  lblDiffuseId.Caption := IntToStr(sbDiffuseTextureId.Position);
+  lblBumpId.Caption := IntToStr(sbBumpTextureId.Position);
+  lblNormalId.Caption := IntToStr(sbNormalTextureId.Position);
+  lblSpecularId.Caption := IntToStr(sbSpecularTextureId.Position);
+  lblReflectionId.Caption := IntToStr(sbReflectionTextureId.Position);
+  lblTransparencyId.Caption := IntToStr(sbTransparencyTextureId.Position);
 
   shMaterialColor.Brush.Color := RGB(
     trunc(material.color.x*255),

@@ -19,6 +19,7 @@ const
   {$endif}
 {$endif}
 
+  PRIMITIVE_NONE = -1;
   MATERIAL_NONE = -1;
   TEXTURE_NONE  = -1;
   TEXTURE_MANDELBROT = -2;
@@ -327,6 +328,11 @@ Function RayTracer_LoadTextureFromFile(
   index: integer; filename: AnsiString ) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
 Function RayTracer_GetNbTextures : Integer; cdecl; external RAYTRACERMODULE_DLL;
+
+Function RayTracer_GetTextureSize(
+  index: integer; var width,height,depth: Integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
+Function RayTracer_GetTexture(
+  index: integer; image: Pointer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
   //extern "C" RAYTRACINGENGINE_API long RayTracer_SetTexture( int index, HANDLE texture );
 

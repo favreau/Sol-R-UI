@@ -8,7 +8,7 @@ uses
   VCLTee.TeCanvas, Vcl.ColorGrd, Vcl.Ribbon, Vcl.RibbonLunaStyleActnCtrls,
   Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnList, Vcl.Mask, Vcl.Samples.Spin, Vcl.ActnColorMaps,
-  Vcl.Buttons, Vcl.Menus, Vcl.ImgList;
+  Vcl.Buttons, Vcl.Menus, Vcl.ImgList, Vcl.Grids;
 
 type
   TModelType = ( mtNone = 0, mtPDB = 1, mtOBJ = 2, mtIRT );
@@ -139,23 +139,11 @@ type
     lblNoiseValue: TLabel;
     gbTextureIds: TGroupBox;
     Label40: TLabel;
-    lblTransparencyId: TLabel;
-    lblReflectionId: TLabel;
     Label39: TLabel;
     Label38: TLabel;
     Label37: TLabel;
     Label36: TLabel;
     Label31: TLabel;
-    lblNormalId: TLabel;
-    lblSpecularId: TLabel;
-    lblBumpId: TLabel;
-    lblDiffuseId: TLabel;
-    sbTransparencyTextureId: TScrollBar;
-    sbReflectionTextureId: TScrollBar;
-    sbDiffuseTextureId: TScrollBar;
-    sbBumpTextureId: TScrollBar;
-    sbNormalTextureId: TScrollBar;
-    sbSpecularTextureId: TScrollBar;
     cbDoubleSidedTriangles: TCheckBox;
     cbGradientBackGround: TCheckBox;
     cbAdvancedRenderingFeatures: TCheckBox;
@@ -168,6 +156,25 @@ type
     miScreenshot: TMenuItem;
     N2: TMenuItem;
     cbCastShadows: TCheckBox;
+    odImage: TOpenDialog;
+    imgDiffuseTexture: TImage;
+    imgBumpTexture: TImage;
+    imgNormalTexture: TImage;
+    imgSpecularTexture: TImage;
+    imgReflectionTexture: TImage;
+    imgTransparencyTexture: TImage;
+    imgNone: TImage;
+    tsTextures: TTabSheet;
+    dgTextures: TDrawGrid;
+    pmTextureAssignment: TPopupMenu;
+    miDiffuseTexture: TMenuItem;
+    miBumpTexture: TMenuItem;
+    miNormalTexture: TMenuItem;
+    Specular1: TMenuItem;
+    miReflectionTexture: TMenuItem;
+    miTransparentTexture: TMenuItem;
+    pnlManageTextures: TPanel;
+    btnAddTexture: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -233,6 +240,24 @@ type
     procedure cbPlatformsChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure miScreenshotClick(Sender: TObject);
+    procedure btnLoadTextureClick(Sender: TObject);
+    procedure dgTexturesDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure miDiffuseTextureClick(Sender: TObject);
+    procedure dgTexturesSelectCell(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
+    procedure miBumpTextureClick(Sender: TObject);
+    procedure miNormalTextureClick(Sender: TObject);
+    procedure Specular1Click(Sender: TObject);
+    procedure miReflectionTextureClick(Sender: TObject);
+    procedure miTransparentTextureClick(Sender: TObject);
+    procedure btnAddTextureClick(Sender: TObject);
+    procedure imgDiffuseTextureClick(Sender: TObject);
+    procedure imgBumpTextureClick(Sender: TObject);
+    procedure imgNormalTextureClick(Sender: TObject);
+    procedure imgSpecularTextureClick(Sender: TObject);
+    procedure imgReflectionTextureClick(Sender: TObject);
+    procedure imgTransparencyTextureClick(Sender: TObject);
   private
     { Private declarations }
     pathTracingIteration : integer;
@@ -245,6 +270,10 @@ type
     procedure updateMaterial;
     procedure updateMaterialControls;
 
+    procedure updateTextureControls;
+    procedure loadTextureIntoControl(index: integer; image: TImage);
+    procedure ConvertFromBGRtoRGB;
+
   public
     {initialization}
     procedure Initialize;
@@ -253,11 +282,13 @@ type
     Procedure RenderScene;
 
     { Controls }
-    procedure setMaterialControls( material: TMaterial );
+    procedure setMaterialControls;
     procedure updatePrimitiveControls;
 
     {textures}
     procedure loadTextures( filter: string );
+
+    procedure activateTextureTab(Sender: TObject);
 
   private
     { Kernel }
@@ -291,16 +322,19 @@ type
     previousSelectedPrimitive: integer;
     previousSelectedMaterial: integer;
 
-    currentMaterial : integer;
-    currentPrimitive: integer;
-    controlUpdate : boolean;
+    FCurrentMaterialId    : integer;
+    FCurrentMaterial      : TMaterial;
+    FCurrentPrimitive     : integer;
+    FCurrentSelectedTextureId: integer;
+    FControlUpdate        : boolean;
 
     {Models}
     nbPrimitives : integer;
 
   private
     {bitmap}
-    F3DBitmap      : TBitmap;
+    F3DBitmap       : TBitmap;
+    FTexturePreview: TBitmap;
 
     {rendering}
     maxPathTracingIterations: integer;
@@ -354,31 +388,10 @@ begin
   loadTextures('*.jpg');
   loadTextures('*.tga');
 
+  updateTextureControls;
+
   i := RayTracer_GetNbTextures;
   memLogs.Lines.Add( IntToStr(i) + ' textures loaded');
-  sbDiffuseTextureId.Max := i-1;
-  sbDiffuseTextureId.Min := -1;
-  sbDiffuseTextureId.Enabled := ( sbDiffuseTextureId.Max <> 0 );
-
-  sbBumpTextureId.Max := i-1;
-  sbBumpTextureId.Min := -1;
-  sbBumpTextureId.Enabled := ( sbBumpTextureId.Max <> 0 );
-
-  sbNormalTextureId.Max := i-1;
-  sbNormalTextureId.Min := -1;
-  sbNormalTextureId.Enabled := ( sbNormalTextureId.Max <> 0 );
-
-  sbSpecularTextureId.Max := i-1;
-  sbSpecularTextureId.Min := -1;
-  sbSpecularTextureId.Enabled := ( sbSpecularTextureId.Max <> 0 );
-
-  sbReflectionTextureId.Max := i-1;
-  sbReflectionTextureId.Min := -1;
-  sbReflectionTextureId.Enabled := ( sbSpecularTextureId.Max <> 0 );
-
-  sbTransparencyTextureId.Max := i-1;
-  sbTransparencyTextureId.Min := -1;
-  sbTransparencyTextureId.Enabled := ( sbSpecularTextureId.Max <> 0 );
 
   for i := 0 to NB_MAX_MATERIALS-1 do
     RayTracer_AddMaterial;
@@ -436,8 +449,8 @@ var
   transparencyTextureId: integer;
   wireFrame: boolean;
 begin
-  controlUpdate := false;
-  currentMaterial := -1;
+  FControlUpdate := false;
+  FCurrentMaterialId := MATERIAL_NONE;
   for i := 0 to NB_MAX_MATERIALS-1 do
   begin
 		diffuseTextureId := TEXTURE_NONE;
@@ -581,7 +594,13 @@ begin
   F3DBitmap.Height := img3DView.Height;
   F3DBitmap.PixelFormat := pf24bit;
 
-  currentPrimitive := -1;
+  FTexturePreview := TBitmap.Create;
+  FTexturePreview.Width  := 4096;
+  FTexturePreview.Height := 4096;
+  FTexturePreview.PixelFormat := pf24bit;
+
+  FCurrentPrimitive := PRIMITIVE_NONE;
+  FCurrentSelectedTextureId := TEXTURE_NONE;
 
   if( not FKernelInitialized ) then
   begin
@@ -651,8 +670,44 @@ procedure TmainForm.rgMouseControlsClick(Sender: TObject);
 begin
   if( rgMouseControls.ItemIndex = 2 ) then
   begin
-    currentMaterial := DEFAULT_LIGHT_MATERIAL;
+    FCurrentMaterialId := DEFAULT_LIGHT_MATERIAL;
     updateMaterialControls;
+  end;
+end;
+
+procedure TmainForm.miBumpTextureClick(Sender: TObject);
+begin
+  if FCurrentSelectedTextureId<>TEXTURE_NONE then
+  begin
+    FCurrentMaterial.bumpTextureId := FCurrentSelectedTextureId;
+    updateMaterial;
+  end;
+end;
+
+procedure TmainForm.miDiffuseTextureClick(Sender: TObject);
+begin
+  if FCurrentSelectedTextureId<>TEXTURE_NONE then
+  begin
+    FCurrentMaterial.diffuseTextureId := FCurrentSelectedTextureId;
+    updateMaterial;
+  end;
+end;
+
+procedure TmainForm.miNormalTextureClick(Sender: TObject);
+begin
+  if FCurrentSelectedTextureId<>TEXTURE_NONE then
+  begin
+    FCurrentMaterial.normalTextureId := FCurrentSelectedTextureId;
+    updateMaterial;
+  end;
+end;
+
+procedure TmainForm.miReflectionTextureClick(Sender: TObject);
+begin
+  if FCurrentSelectedTextureId<>TEXTURE_NONE then
+  begin
+    FCurrentMaterial.reflectionTextureId := FCurrentSelectedTextureId;
+    updateMaterial;
   end;
 end;
 
@@ -680,6 +735,15 @@ begin
   if sdSaveFile.Execute then
   begin
     RayTracer_GenerateScreenshot(AnsiString(sdSaveFile.FileName),1);
+  end;
+end;
+
+procedure TmainForm.miTransparentTextureClick(Sender: TObject);
+begin
+  if FCurrentSelectedTextureId<>TEXTURE_NONE then
+  begin
+    FCurrentMaterial.transparencyTextureId := FCurrentSelectedTextureId;
+    updateMaterial;
   end;
 end;
 
@@ -715,6 +779,15 @@ begin
 {$else}
   pnlSystem.Visible := false;
 {$endif CUDA}
+
+   imgDiffuseTexture.Picture.Assign(imgNone.Picture);
+   imgBumpTexture.Picture.Assign(imgNone.Picture);
+   imgNormalTexture.Picture.Assign(imgNone.Picture);
+   imgSpecularTexture.Picture.Assign(imgNone.Picture);
+   imgReflectionTexture.Picture.Assign(imgNone.Picture);
+   imgTransparencyTexture.Picture.Assign(imgNone.Picture);
+
+    pgParameters.ActivePage := tsControls;
 end;
 
 procedure TmainForm.FormDestroy(Sender: TObject);
@@ -740,63 +813,57 @@ end;
 
 procedure TmainForm.updateMaterial;
 var
-  material: TMaterial;
   fastTransparency: integer;
 begin
-  if( not controlUpdate ) and ( currentMaterial <> -1 ) then
+  if( not FControlUpdate ) and ( FCurrentMaterialId<>MATERIAL_NONE ) then
   begin
     if( cbFastTransparency.Checked ) then fastTransparency := 1 else fastTransparency := 0;
     pathTracingIteration := 0;
-    material.color.x := GetRValue(shMaterialColor.Brush.Color)/255;
-    material.color.y := GetGValue(shMaterialColor.Brush.Color)/255;
-    material.color.z := GetBValue(shMaterialColor.Brush.Color)/255;
-    material.noise   := sbNoise.Position/100;
-    material.reflection := sbReflection.Position/100;
-    material.refraction := 1+sbRefraction.Position/100;
-    material.procedural := integer(cbProcedural.checked);
-    material.wireframe  := integer(not cbCastShadows.Checked);
-    material.wireframeDepth := 0;
-    material.transparency:= sbTransparency.Position/100;
-    material.diffuseTextureId:=sbDiffuseTextureId.Position;
-    material.normalTextureId:=sbNormalTextureId.Position;
-    material.bumpTextureId:=sbBumpTextureId.Position;
-    material.specularTextureId:=sbSpecularTextureId.Position;
-    material.reflectionTextureId:=sbReflectionTextureId.Position;
-    material.transparencyTextureId:=sbTransparencyTextureId.Position;
-    material.specular.x:=sbSpecValue.Position/100;
-    material.specular.y:=sbSpecPower.Position;
-    material.specular.z:=sbSpecCoef.Position/100;
-    material.innerIllumination:=sbInnerIllumination.Position/100;
-    material.illuminationDiffusion:=sbIlluminationDiffusion.Position*5000;
-    material.illuminationPropagation:=sbIlluminationPropagation.Position*5000;
-    material.fastTransparency:=fastTransparency;
+    FCurrentMaterial.color.x := GetRValue(shMaterialColor.Brush.Color)/255;
+    FCurrentMaterial.color.y := GetGValue(shMaterialColor.Brush.Color)/255;
+    FCurrentMaterial.color.z := GetBValue(shMaterialColor.Brush.Color)/255;
+    FCurrentMaterial.noise   := sbNoise.Position/100;
+    FCurrentMaterial.reflection := sbReflection.Position/100;
+    FCurrentMaterial.refraction := 1+sbRefraction.Position/100;
+    FCurrentMaterial.procedural := integer(cbProcedural.checked);
+    FCurrentMaterial.wireframe  := integer(not cbCastShadows.Checked);
+    FCurrentMaterial.wireframeDepth := 0;
+    FCurrentMaterial.transparency:= sbTransparency.Position/100;
+    FCurrentMaterial.specular.x:=sbSpecValue.Position/100;
+    FCurrentMaterial.specular.y:=sbSpecPower.Position;
+    FCurrentMaterial.specular.z:=sbSpecCoef.Position/100;
+    FCurrentMaterial.innerIllumination:=sbInnerIllumination.Position/100;
+    FCurrentMaterial.illuminationDiffusion:=sbIlluminationDiffusion.Position*5000;
+    FCurrentMaterial.illuminationPropagation:=sbIlluminationPropagation.Position*5000;
+    FCurrentMaterial.fastTransparency:=fastTransparency;
 
     RayTracer_SetMaterial(
-      currentMaterial,
-      material.color.x,material.color.y,material.color.z,
-      material.noise,
-      material.reflection,
-      material.refraction,
-      material.procedural,
-      material.wireframe, material.wireframeDepth,
-      material.transparency,
-      material.diffuseTextureId,
-      material.normalTextureId,
-      material.bumpTextureId,
-      material.specularTextureId,
-      material.reflectionTextureId,
-      material.transparencyTextureId,
-      material.specular.x,material.specular.y,material.specular.z,
-      material.innerIllumination,material.illuminationDiffusion,material.illuminationPropagation,
-      material.fastTransparency );
-    setMaterialControls(material);
+      FCurrentMaterialId,
+      FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
+      FCurrentMaterial.noise,
+      FCurrentMaterial.reflection,
+      FCurrentMaterial.refraction,
+      FCurrentMaterial.procedural,
+      FCurrentMaterial.wireframe, FCurrentMaterial.wireframeDepth,
+      FCurrentMaterial.transparency,
+      FCurrentMaterial.diffuseTextureId,
+      FCurrentMaterial.normalTextureId,
+      FCurrentMaterial.bumpTextureId,
+      FCurrentMaterial.specularTextureId,
+      FCurrentMaterial.reflectionTextureId,
+      FCurrentMaterial.transparencyTextureId,
+      FCurrentMaterial.specular.x,FCurrentMaterial.specular.y,FCurrentMaterial.specular.z,
+      FCurrentMaterial.innerIllumination,FCurrentMaterial.illuminationDiffusion,FCurrentMaterial.illuminationPropagation,
+      FCurrentMaterial.fastTransparency );
+
+    setMaterialControls;
     updateScene;
   end;
 end;
 
 procedure TmainForm.updateScene;
 begin
-  if( not controlUpdate ) then
+  if( not FControlUpdate ) then
   begin
     RayTracer_SetSceneInfo(
       img3DView.Width,
@@ -971,8 +1038,8 @@ var
 begin
   if FKernelInitialized then
   begin
-    currentPrimitive := RayTracer_GetPrimitiveAt(x,img3DView.Height-y);
-    lblPrimitiveID.Caption := 'Primitive ID: ' + IntToStr(currentPrimitive);
+    FCurrentPrimitive := RayTracer_GetPrimitiveAt(x,img3DView.Height-y);
+    lblPrimitiveID.Caption := 'Primitive ID: ' + IntToStr(FCurrentPrimitive);
   end;
 
   if(cbDraftMode.Checked) then RayTracer_SetDraftMode(1);
@@ -1078,29 +1145,27 @@ begin
 end;
 
 procedure TmainForm.updateMaterialControls;
-var
-  material: TMaterial;
 begin
-  if( currentMaterial <> -1 ) then
+  if( FCurrentMaterialId<>MATERIAL_NONE ) then
   begin
     // Selection
     RayTracer_GetMaterial(
-      currentMaterial,
-      material.color.x,material.color.y,material.color.z,
-      material.noise, material.reflection, material.refraction,
-      material.procedural,
-      material.wireframe, material.wireframeDepth,
-      material.transparency,
-      material.diffuseTextureId,
-      material.normalTextureId,
-      material.bumpTextureId,
-      material.specularTextureId,
-      material.reflectionTextureId,
-      material.transparencyTextureId,
-      material.specular.x, material.specular.y, material.specular.z,
-      material.innerIllumination, material.illuminationDiffusion, material.illuminationPropagation,
-      material.FastTransparency );
-    setMaterialControls( material );
+      FCurrentMaterialId,
+      FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
+      FCurrentMaterial.noise, FCurrentMaterial.reflection, FCurrentMaterial.refraction,
+      FCurrentMaterial.procedural,
+      FCurrentMaterial.wireframe, FCurrentMaterial.wireframeDepth,
+      FCurrentMaterial.transparency,
+      FCurrentMaterial.diffuseTextureId,
+      FCurrentMaterial.normalTextureId,
+      FCurrentMaterial.bumpTextureId,
+      FCurrentMaterial.specularTextureId,
+      FCurrentMaterial.reflectionTextureId,
+      FCurrentMaterial.transparencyTextureId,
+      FCurrentMaterial.specular.x, FCurrentMaterial.specular.y, FCurrentMaterial.specular.z,
+      FCurrentMaterial.innerIllumination, FCurrentMaterial.illuminationDiffusion, FCurrentMaterial.illuminationPropagation,
+      FCurrentMaterial.FastTransparency );
+    setMaterialControls;
 
     tsMaterial.Enabled := true;
     tsObject.Enabled := true;
@@ -1117,19 +1182,19 @@ begin
   mouseButton := Button;
   previousMouseY := (Y-img3DView.Height div 2);
 
-  if( currentPrimitive <> -1 ) and ( Button = mbLeft ) then
+  if( FCurrentPrimitive<>PRIMITIVE_NONE ) and ( Button = mbLeft ) then
   begin
     case rgMouseControls.ItemIndex of
       1: // Molecule
       begin
-        currentMaterial := RayTracer_GetPrimitiveMaterial(currentPrimitive);
+        FCurrentMaterialId := RayTracer_GetPrimitiveMaterial(FCurrentPrimitive);
         updateMaterialControls;
         updatePrimitiveControls;
         pathTracingIteration := 0;
       end;
       3: // Post processing effetcs
       begin
-        RayTracer_GetPrimitiveCenter(currentPrimitive, center.x, center.y, center.z);
+        RayTracer_GetPrimitiveCenter(FCurrentPrimitive, center.x, center.y, center.z);
         postProcessingParam := center.z-viewPos.z;
         pathTracingIteration := 0;
       end;
@@ -1154,6 +1219,36 @@ begin
   mouseDown := false;
 end;
 
+procedure TmainForm.imgBumpTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
+end;
+
+procedure TmainForm.imgDiffuseTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
+end;
+
+procedure TmainForm.imgNormalTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
+end;
+
+procedure TmainForm.imgReflectionTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
+end;
+
+procedure TmainForm.imgSpecularTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
+end;
+
+procedure TmainForm.imgTransparencyTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
+end;
+
 procedure TmainForm.TimerTimer(Sender: TObject);
 begin
   if( pathTracingIteration < maxPathTracingIterations ) then
@@ -1174,7 +1269,6 @@ end;
 procedure TmainForm.updateWorld;
 var
   primitiveId: integer;
-  size: double;
   groundHeight : double;
   boxSize : double;
   tiles: integer;
@@ -1234,6 +1328,7 @@ begin
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptSphere));
       RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
     end;
     3: // Ground
     begin
@@ -1416,6 +1511,26 @@ begin
   Screen.Cursor := crDefault;
 end;
 
+procedure TmainForm.btnAddTextureClick(Sender: TObject);
+var
+  n: integer;
+begin
+  if odImage.Execute then
+  begin
+    n := RayTracer_GetNbTextures;
+    RayTracer_LoadTextureFromFile(n+1,AnsiString(odImage.FileName));
+    updateTextureControls;
+  end;
+end;
+
+procedure TmainForm.btnLoadTextureClick(Sender: TObject);
+begin
+  if odImage.Execute then
+  begin
+    RayTracer_LoadTextureFromFile(0,AnsiString(odImage.FileName));
+  end;
+end;
+
 procedure TmainForm.btnOpenClick(Sender: TObject);
 var
   httpRequest: TIdHTTP;
@@ -1494,6 +1609,45 @@ begin
   updateMaterials;
 end;
 
+procedure TmainForm.dgTexturesDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  n,index: integer;
+  width,height,depth: integer;
+begin
+  if FKernelInitialized then
+  begin
+     n := RayTracer_GetNbTextures;
+     index := ARow*dgTextures.ColCount+ACol;
+     memLogs.Lines.Add('Texture ('+IntToStr(ARow)+','+IntToStr(ACol)+') '+intToStr(index));
+     if index<n then
+     begin
+       if RayTracer_GetTextureSize(index,width,height,depth)=0 then
+       begin
+         FTexturePreview.Free;
+         FTexturePreview := TBitmap.Create;
+         FTexturePreview.Width  := width;
+         FTexturePreview.Height := height;
+         case depth of
+           3: FTexturePreview.PixelFormat := pf24bit;
+         else
+           FTexturePreview.PixelFormat := pf32bit;
+         end;
+
+         RayTracer_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
+         dgTextures.Canvas.StretchDraw(Rect,FTexturePreview);
+         ConvertFromBGRtoRGB(FTexturePreview);
+       end;
+     end;
+  end;
+end;
+
+procedure TmainForm.dgTexturesSelectCell(Sender: TObject; ACol, ARow: Integer;
+  var CanSelect: Boolean);
+begin
+  FCurrentSelectedTextureId := ARow*dgTextures.ColCount+ACol;
+end;
+
 procedure TmainForm.edtMoleculeIdExit(Sender: TObject);
 begin
   btnOpenClick(sender);
@@ -1511,10 +1665,10 @@ end;
 
 procedure TmainForm.updateObjectAttributes(Sender: TObject);
 begin
-  if( currentPrimitive <> -1 ) and ( not controlUpdate ) then
+  if( FCurrentPrimitive<>PRIMITIVE_NONE ) and ( not FControlUpdate ) then
   begin
     RayTracer_SetPrimitive(
-      currentPrimitive,
+      FCurrentPrimitive,
       seCenterX.Value, seCenterY.Value, seCenterZ.Value,
       seOtherCenterX.Value, seOtherCenterY.Value, seOtherCenterZ.Value,
       0,0,0,
@@ -1529,11 +1683,11 @@ procedure TmainForm.updatePrimitiveControls;
 var
   primitive: TPrimitive;
 begin
-  controlUpdate := true;
+  FControlUpdate := true;
 
   // Primitive
   if( RayTracer_GetPrimitive(
-    currentPrimitive,
+    FCurrentPrimitive,
     primitive.p0.x,primitive.p0.y,primitive.p0.z,
     primitive.p1.x,primitive.p1.y,primitive.p1.z,
     primitive.p2.x,primitive.p2.y,primitive.p2.z,
@@ -1558,7 +1712,7 @@ begin
   seMaterialId.Value := primitive.materialId;
 
   //tsObject.Enabled := true;
-  controlUpdate := false;
+  FControlUpdate := false;
 end;
 
 procedure TmainForm.shBackgroundColorMouseDown(Sender: TObject;
@@ -1584,49 +1738,54 @@ begin
   end;
 end;
 
-procedure TmainForm.setMaterialControls( material: TMaterial );
+procedure TmainForm.Specular1Click(Sender: TObject);
 begin
-  controlUpdate := true;
+  if FCurrentSelectedTextureId<>TEXTURE_NONE then
+  begin
+    FCurrentMaterial.specularTextureId := FCurrentSelectedTextureId;
+    updateMaterial;
+  end;
+end;
 
-  sbSpecValue.Position := trunc(material.specular.x*100);
-  sbSpecPower.Position := trunc(material.specular.y);
-  sbSpecCoef.Position  := trunc(material.specular.z*100);
-  sbInnerIllumination.Position  := trunc(material.innerIllumination*100);
-  sbIlluminationDiffusion.Position := trunc(material.illuminationDiffusion/5000);
-  sbIlluminationPropagation.Position := trunc(material.illuminationPropagation/5000);
-  cbProcedural.Checked := ( material.procedural = 1 );
-  sbReflection.Position := trunc(material.reflection*100);
-  sbTransparency.Position := trunc(material.transparency*100);
-  sbRefraction.Position := trunc((material.refraction-1)*100);
-  sbNoise.Position := trunc(material.noise*100);
-  sbDiffuseTextureId.Position := material.diffuseTextureId;
-  sbBumpTextureId.Position := material.bumpTextureId;
-  sbNormalTextureId.Position := material.normalTextureId;
-  sbSpecularTextureId.Position := material.specularTextureId;
-  cbCastShadows.Checked := (material.wireframe=0);
+procedure TmainForm.setMaterialControls;
+begin
+  FControlUpdate := true;
+
+  sbSpecValue.Position := trunc(FCurrentMaterial.specular.x*100);
+  sbSpecPower.Position := trunc(FCurrentMaterial.specular.y);
+  sbSpecCoef.Position  := trunc(FCurrentMaterial.specular.z*100);
+  sbInnerIllumination.Position  := trunc(FCurrentMaterial.innerIllumination*100);
+  sbIlluminationDiffusion.Position := trunc(FCurrentMaterial.illuminationDiffusion/5000);
+  sbIlluminationPropagation.Position := trunc(FCurrentMaterial.illuminationPropagation/5000);
+  cbProcedural.Checked := ( FCurrentMaterial.procedural = 1 );
+  sbReflection.Position := trunc(FCurrentMaterial.reflection*100);
+  sbTransparency.Position := trunc(FCurrentMaterial.transparency*100);
+  sbRefraction.Position := trunc((FCurrentMaterial.refraction-1)*100);
+  sbNoise.Position := trunc(FCurrentMaterial.noise*100);
+
+  loadTextureIntoControl(FCurrentMaterial.diffuseTextureId,imgDiffuseTexture);
+  loadTextureIntoControl(FCurrentMaterial.bumpTextureId,imgBumpTexture);
+  loadTextureIntoControl(FCurrentMaterial.normalTextureId,imgNormalTexture);
+  loadTextureIntoControl(FCurrentMaterial.specularTextureId,imgSpecularTexture);
+  loadTextureIntoControl(FCurrentMaterial.reflectionTextureId,imgReflectionTexture);
+  loadTextureIntoControl(FCurrentMaterial.transparencyTextureId,imgTransparencyTexture);
+
+  cbCastShadows.Checked := (FCurrentMaterial.wireframe=0);
 
   // Labels
-  lblReflectionValue.Caption := FloatToStrF(material.reflection,ffNumber,1,2);
-  lblTransparencyValue.Caption := FloatToStrF(material.transparency,ffNumber,1,2);
-  lblRefractionValue.Caption := FloatToStrF(material.refraction,ffNumber,1,2);
-  lblNoiseValue.Caption := FloatToStrF(material.noise,ffNumber,1,2);
-
-  lblDiffuseId.Caption := IntToStr(sbDiffuseTextureId.Position);
-  lblBumpId.Caption := IntToStr(sbBumpTextureId.Position);
-  lblNormalId.Caption := IntToStr(sbNormalTextureId.Position);
-  lblSpecularId.Caption := IntToStr(sbSpecularTextureId.Position);
-  lblReflectionId.Caption := IntToStr(sbReflectionTextureId.Position);
-  lblTransparencyId.Caption := IntToStr(sbTransparencyTextureId.Position);
+  lblReflectionValue.Caption := FloatToStrF(FCurrentMaterial.reflection,ffNumber,1,2);
+  lblTransparencyValue.Caption := FloatToStrF(FCurrentMaterial.transparency,ffNumber,1,2);
+  lblRefractionValue.Caption := FloatToStrF(FCurrentMaterial.refraction,ffNumber,1,2);
+  lblNoiseValue.Caption := FloatToStrF(FCurrentMaterial.noise,ffNumber,1,2);
 
   shMaterialColor.Brush.Color := RGB(
-    trunc(material.color.x*255),
-    trunc(material.color.y*255),
-    trunc(material.color.z*255));
+    trunc(FCurrentMaterial.color.x*255),
+    trunc(FCurrentMaterial.color.y*255),
+    trunc(FCurrentMaterial.color.z*255));
 
-  cbFastTransparency.Checked := (material.FastTransparency = 1);
+  cbFastTransparency.Checked := (FCurrentMaterial.FastTransparency = 1);
 
-  //tsMaterial.Enabled := true;
-  controlUpdate := false;
+  FControlUpdate := false;
 end;
     
 procedure TmainForm.sbPPIntensityChange(Sender: TObject);
@@ -1667,6 +1826,53 @@ procedure TmainForm.pnlCenterMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
   mouseDown := false;
+end;
+
+procedure TmainForm.loadTextureIntoControl(index: integer; image: TImage);
+var
+  width,height,depth: integer;
+begin
+  if index=TEXTURE_NONE then
+  begin
+    image.Picture.Assign(imgNone.Picture);
+  end
+  else
+  begin
+    RayTracer_GetTextureSize(index,width,height,depth);
+    FTexturePreview.Free;
+    FTexturePreview := TBitmap.Create;
+    FTexturePreview.Width  := width;
+    FTexturePreview.Height := height;
+    case depth of
+      3: FTexturePreview.PixelFormat := pf24bit;
+    else
+      FTexturePreview.PixelFormat := pf32bit;
+    end;
+
+    RayTracer_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
+    image.Picture.Bitmap.Assign(FTexturePreview);
+    memLogs.Lines.Add('Texture size ('+IntToStr(width)+'x'+IntToStr(height)+'x'+IntToStr(depth) + ')');
+  end;
+  image.Refresh;
+end;
+
+procedure TmainForm.updateTextureControls;
+var
+  n : integer;
+begin
+  n := RayTracer_GetNbTextures;
+  dgTextures.RowCount := n div dgTextures.ColCount;
+  memLogs.Lines.Add(intToStr(n) + ' textures available');
+end;
+
+procedure TmainForm.activateTextureTab(Sender: TObject);
+begin
+  pgParameters.ActivePage := tsTextures;
+end;
+
+procedure TmainForm.ConvertFromBGRtoRGB;
+begin
+  FTexturePreview.c
 end;
 
 end.

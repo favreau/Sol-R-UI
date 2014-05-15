@@ -1,6 +1,6 @@
 object mainForm: TmainForm
-  Left = 545
-  Top = 400
+  Left = 549
+  Top = 231
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'SoL-R Editor'
@@ -8036,7 +8036,7 @@ object mainForm: TmainForm
     TabOrder = 0
     OnMouseMove = pnlCenterMouseMove
     object img3DView: TImage
-      Left = 5
+      Left = 6
       Top = 6
       Width = 512
       Height = 512
@@ -8044,6 +8044,49 @@ object mainForm: TmainForm
       OnMouseDown = img3DViewMouseown
       OnMouseMove = img3DViewMouseMove
       OnMouseUp = img3DViewMouseUp
+    end
+    object imgNone: TImage
+      Left = 72
+      Top = 288
+      Width = 48
+      Height = 48
+      Picture.Data = {
+        0A544A504547496D61676550040000FFD8FFE000104A46494600010101006400
+        640000FFDB004300020101020101020202020202020203050303030303060404
+        0305070607070706070708090B0908080A0807070A0D0A0A0B0C0C0C0C07090E
+        0F0D0C0E0B0C0C0CFFC0000B080030003001011100FFC4001B00000202030100
+        000000000000000000000708040502030609FFC4002E10000104010205030402
+        0203000000000001020304050600110708122131417181133251610942223352
+        8291FFDA0008010100003F00F7F350AEEF6163558F4DB0971E1438E9EA71E7DC
+        084207EC93B683395F3FF84D04C53105BB5BA524EDF523B294347D8ACA49F81A
+        D38DFF0020D865B4C4B36112E2A0A8805C7594BAD8DFF3D04AB6FF00AE8CD8B6
+        5B599AD3B761513A358C27BEC758702D3BFA83B7823D41EFAB3D45B6B48F4757
+        226CB750C4588D29E75C5786D2904951F60348D71AB8B96FC74BC4DFD841B51C
+        3FAFB04454351BFC120793BA8EE3EB293DF72361D407BB5BC0EC3F02730B8561
+        88D656AA0C846E97CB416FEE3B10B52B750583E413ABFCC384B8DE7D0571EDE9
+        2B66A17FD96C24389FD85801493EC74B767B815E72499A3192E352254FC4673C
+        96A643757BF46FE10BF4F1F6B9E41EC7F6D062395C2CDF1A836F5CEFD78562CA
+        5F697EBD246FB11E847823F3A1873D592BB8EF2F93D0CA8A4D948661AC8FF815
+        15287C84EDABDE0870BEB6AF97AA5A19515893127D7A5D98DAD00A5F53A90B59
+        3F2AEC7D361A09DDD2641C8C67E6D6A848B5C0ED5D097D852B72D13E10A3E12E
+        01F6AFC28763A66704CEEB38938CC5B8A794897065A774A8765248F2950F2950
+        3D883AD3C4EC423E7DC3EB8A89280B6A74471BEFDFA55D3BA543F614011EDA10
+        FF001E9923D65C21B0AC7C9269EC5684027EC4AD295F4FC28AF57DCF1E2AEE4F
+        CBE592994A96AAB79A9AA03C94A4F4ABFF0012A27E35D0F2D19C339FF0431E98
+        DAC1763C64439091E50EB402140FBEC0FB1D7637D430F28A6915F6119A970A5B
+        65B799746E97127C8234AD5DD2DFF2319F9B5AA122D703B57425F614A24B47D1
+        2A3E12E01F6AFC28763A3B5F71BA91EE08D86610663722BD30D6B68EFB2BEAED
+        B25A23C85F5909235C07F1ED8ABD4FC1E9B64F02157360B7504FF6421296FABE
+        5417A39D84162D60BD164B687A3C86D4D3ADA86E95A54362923F041D2A6A4E41
+        C89F11253AD45916D815C3A08E93FE9FC027C25D48EDDFB2C7EFC1EB05E6370A
+        E21C24BB02FE0B4E2802A8F29D11DF6CFE0A54413F1B8D61C4DE2FE03598BCB8
+        D905CD3498525A536EC40EA642DF491F686D2493BFA76D291C30E114EE38E676
+        14B8B3B710B0354E4C87DC967FC5A4A7709DC03D2A776242479F5569E3C631C8
+        78850C3ABAF68310A0B296196C7F54A46C3DCFE4EAC751EC6BA3DB427634A659
+        9319E494B8D3A80B4380F90411B11A11655C8A70FF002698A7DB853EA54A3BA9
+        1064F4364FE92A0A03E00D6BC7790AE1F50CC4BCEC7B4B3093B86E5CADDBF908
+        09DFE745DA3A1858CD6350ABE247831181D2DB2C3610840FD0000D4CD7FFD9}
+      Visible = False
     end
     object Panel1: TPanel
       Left = 1
@@ -8116,12 +8159,11 @@ object mainForm: TmainForm
       Top = 1
       Width = 237
       Height = 656
-      ActivePage = tsControls
+      ActivePage = tsMaterial
       Align = alClient
       TabOrder = 0
       object tsControls: TTabSheet
         Caption = 'Controls'
-        ImageIndex = 3
         object rgMouseControls: TRadioGroup
           AlignWithMargins = True
           Left = 3
@@ -8882,166 +8924,145 @@ object mainForm: TmainForm
           Caption = 'Textures'
           TabOrder = 2
           object Label40: TLabel
-            Left = 16
-            Top = 144
+            Left = 3
+            Top = 212
             Width = 68
             Height = 13
             Caption = 'Transparency:'
           end
-          object lblTransparencyId: TLabel
-            Left = 199
-            Top = 146
-            Width = 6
-            Height = 13
-            Caption = '0'
-          end
-          object lblReflectionId: TLabel
-            Left = 199
-            Top = 123
-            Width = 6
-            Height = 13
-            Caption = '0'
-          end
           object Label39: TLabel
-            Left = 16
-            Top = 125
+            Left = 5
+            Top = 156
             Width = 51
             Height = 13
             Caption = 'Reflection:'
           end
           object Label38: TLabel
-            Left = 16
+            Left = 114
             Top = 96
             Width = 45
             Height = 13
             Caption = 'Specular:'
           end
           object Label37: TLabel
-            Left = 16
-            Top = 77
+            Left = 3
+            Top = 93
             Width = 36
             Height = 13
             Caption = 'Normal:'
           end
           object Label36: TLabel
-            Left = 16
-            Top = 50
+            Left = 116
+            Top = 26
             Width = 30
             Height = 13
             Caption = 'Bump:'
           end
           object Label31: TLabel
-            Left = 16
+            Left = 3
             Top = 31
             Width = 36
             Height = 13
             Caption = 'Diffuse:'
           end
-          object lblNormalId: TLabel
-            Left = 199
-            Top = 77
-            Width = 6
-            Height = 13
-            Caption = '0'
-          end
-          object lblSpecularId: TLabel
-            Left = 199
-            Top = 100
-            Width = 6
-            Height = 13
-            Caption = '0'
-          end
-          object lblBumpId: TLabel
-            Left = 199
-            Top = 54
-            Width = 6
-            Height = 13
-            Caption = '0'
-          end
-          object lblDiffuseId: TLabel
-            Left = 199
+          object imgDiffuseTexture: TImage
+            Left = 62
             Top = 30
-            Width = 6
-            Height = 13
-            Caption = '0'
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgDiffuseTextureClick
           end
-          object sbTransparencyTextureId: TScrollBar
-            Left = 88
-            Top = 146
-            Width = 105
-            Height = 17
-            Max = 0
-            Min = -1
-            PageSize = 0
-            Position = -1
+          object imgBumpTexture: TImage
+            Left = 165
+            Top = 30
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgBumpTextureClick
+          end
+          object imgNormalTexture: TImage
+            Left = 62
+            Top = 94
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgNormalTextureClick
+          end
+          object imgSpecularTexture: TImage
+            Left = 165
+            Top = 94
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgSpecularTextureClick
+          end
+          object imgReflectionTexture: TImage
+            Left = 111
+            Top = 158
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgReflectionTextureClick
+          end
+          object imgTransparencyTexture: TImage
+            Left = 111
+            Top = 212
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgTransparencyTextureClick
+          end
+        end
+      end
+      object tsTextures: TTabSheet
+        Caption = 'Textures'
+        ImageIndex = 4
+        object dgTextures: TDrawGrid
+          Left = 0
+          Top = 0
+          Width = 229
+          Height = 587
+          Align = alClient
+          BevelOuter = bvRaised
+          ColCount = 2
+          DefaultColWidth = 100
+          DefaultRowHeight = 100
+          DoubleBuffered = True
+          FixedCols = 0
+          FixedRows = 0
+          ParentDoubleBuffered = False
+          PopupMenu = pmTextureAssignment
+          ScrollBars = ssVertical
+          TabOrder = 0
+          OnDrawCell = dgTexturesDrawCell
+          OnSelectCell = dgTexturesSelectCell
+        end
+        object pnlManageTextures: TPanel
+          Left = 0
+          Top = 587
+          Width = 229
+          Height = 41
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 1
+          ExplicitLeft = 56
+          ExplicitTop = 576
+          ExplicitWidth = 185
+          object btnAddTexture: TButton
+            Left = 80
+            Top = 6
+            Width = 75
+            Height = 25
+            Caption = 'Add'
             TabOrder = 0
-            OnChange = sbDiffuseTextureIdChange
-          end
-          object sbReflectionTextureId: TScrollBar
-            Left = 88
-            Top = 123
-            Width = 105
-            Height = 17
-            Max = 0
-            Min = -1
-            PageSize = 0
-            Position = -1
-            TabOrder = 1
-            OnChange = sbDiffuseTextureIdChange
-          end
-          object sbDiffuseTextureId: TScrollBar
-            Left = 88
-            Top = 31
-            Width = 105
-            Height = 17
-            Max = 0
-            Min = -1
-            PageSize = 0
-            Position = -1
-            TabOrder = 2
-            OnChange = sbDiffuseTextureIdChange
-          end
-          object sbBumpTextureId: TScrollBar
-            Left = 88
-            Top = 54
-            Width = 105
-            Height = 17
-            Max = 0
-            Min = -1
-            PageSize = 0
-            Position = -1
-            TabOrder = 3
-            OnChange = sbDiffuseTextureIdChange
-          end
-          object sbNormalTextureId: TScrollBar
-            Left = 88
-            Top = 77
-            Width = 105
-            Height = 17
-            Max = 0
-            Min = -1
-            PageSize = 0
-            Position = -1
-            TabOrder = 4
-            OnChange = sbDiffuseTextureIdChange
-          end
-          object sbSpecularTextureId: TScrollBar
-            Left = 88
-            Top = 100
-            Width = 105
-            Height = 17
-            Max = 0
-            Min = -1
-            PageSize = 0
-            Position = -1
-            TabOrder = 5
-            OnChange = sbDiffuseTextureIdChange
+            OnClick = btnAddTextureClick
           end
         end
       end
       object tsObject: TTabSheet
         Caption = 'Object'
-        ImageIndex = 2
+        ImageIndex = 6
         object gbCoordinates: TGroupBox
           Left = 0
           Top = 0
@@ -9373,5 +9394,39 @@ object mainForm: TmainForm
     Title = 'Save File'
     Left = 400
     Top = 112
+  end
+  object odImage: TOpenDialog
+    Filter = 'Supported formats|*.png;*.jpg;*.bmp'
+    Title = 'Open file'
+    Left = 320
+    Top = 248
+  end
+  object pmTextureAssignment: TPopupMenu
+    Left = 456
+    Top = 264
+    object miDiffuseTexture: TMenuItem
+      Caption = 'Diffuse'
+      OnClick = miDiffuseTextureClick
+    end
+    object miBumpTexture: TMenuItem
+      Caption = 'Bump'
+      OnClick = miBumpTextureClick
+    end
+    object miNormalTexture: TMenuItem
+      Caption = 'Normal'
+      OnClick = miNormalTextureClick
+    end
+    object Specular1: TMenuItem
+      Caption = 'Specular'
+      OnClick = Specular1Click
+    end
+    object miReflectionTexture: TMenuItem
+      Caption = 'Reflection'
+      OnClick = miReflectionTextureClick
+    end
+    object miTransparentTexture: TMenuItem
+      Caption = 'Transparent'
+      OnClick = miTransparentTextureClick
+    end
   end
 end

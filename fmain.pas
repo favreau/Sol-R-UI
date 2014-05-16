@@ -272,7 +272,6 @@ type
 
     procedure updateTextureControls;
     procedure loadTextureIntoControl(index: integer; image: TImage);
-    procedure ConvertFromBGRtoRGB;
 
   public
     {initialization}
@@ -334,7 +333,7 @@ type
   private
     {bitmap}
     F3DBitmap       : TBitmap;
-    FTexturePreview: TBitmap;
+    FTexturePreview : TBitmap;
 
     {rendering}
     maxPathTracingIterations: integer;
@@ -677,38 +676,26 @@ end;
 
 procedure TmainForm.miBumpTextureClick(Sender: TObject);
 begin
-  if FCurrentSelectedTextureId<>TEXTURE_NONE then
-  begin
-    FCurrentMaterial.bumpTextureId := FCurrentSelectedTextureId;
-    updateMaterial;
-  end;
+  FCurrentMaterial.bumpTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
 end;
 
 procedure TmainForm.miDiffuseTextureClick(Sender: TObject);
 begin
-  if FCurrentSelectedTextureId<>TEXTURE_NONE then
-  begin
-    FCurrentMaterial.diffuseTextureId := FCurrentSelectedTextureId;
-    updateMaterial;
-  end;
+  FCurrentMaterial.diffuseTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
 end;
 
 procedure TmainForm.miNormalTextureClick(Sender: TObject);
 begin
-  if FCurrentSelectedTextureId<>TEXTURE_NONE then
-  begin
-    FCurrentMaterial.normalTextureId := FCurrentSelectedTextureId;
-    updateMaterial;
-  end;
+  FCurrentMaterial.normalTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
 end;
 
 procedure TmainForm.miReflectionTextureClick(Sender: TObject);
 begin
-  if FCurrentSelectedTextureId<>TEXTURE_NONE then
-  begin
-    FCurrentMaterial.reflectionTextureId := FCurrentSelectedTextureId;
-    updateMaterial;
-  end;
+  FCurrentMaterial.reflectionTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
 end;
 
 procedure TmainForm.miSaveAsClick(Sender: TObject);
@@ -837,6 +824,7 @@ begin
     FCurrentMaterial.illuminationPropagation:=sbIlluminationPropagation.Position*5000;
     FCurrentMaterial.fastTransparency:=fastTransparency;
 
+    memLogs.Lines.Add('Diffuse: ' + inttostr(FCurrentMaterial.diffuseTextureId));
     RayTracer_SetMaterial(
       FCurrentMaterialId,
       FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
@@ -1317,15 +1305,16 @@ begin
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
       RayTracer_SetPrimitive( primitiveId, -boxSize, -boxSize, boxSize, boxSize, -boxSize, boxSize, boxSize,  boxSize, boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,1,0,1,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
       RayTracer_SetPrimitive( primitiveId,  boxSize,  boxSize, boxSize,-boxSize,  boxSize, boxSize,-boxSize, -boxSize, boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0,0,0,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
     end;
     2: // Water ball
     begin
+      boxSize:=60000;
       primitiveId := RayTracer_AddPrimitive(integer(ptSphere));
       RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
@@ -1333,12 +1322,12 @@ begin
     3: // Ground
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
     end;
@@ -1518,8 +1507,10 @@ begin
   if odImage.Execute then
   begin
     n := RayTracer_GetNbTextures;
-    RayTracer_LoadTextureFromFile(n+1,AnsiString(odImage.FileName));
+    RayTracer_LoadTextureFromFile(n,AnsiString(odImage.FileName));
+    memLogs.Lines.Add(odImage.FileName + ' loaded');
     updateTextureControls;
+    dgTextures.SetFocus;
   end;
 end;
 
@@ -1618,9 +1609,9 @@ begin
   if FKernelInitialized then
   begin
      n := RayTracer_GetNbTextures;
-     index := ARow*dgTextures.ColCount+ACol;
-     memLogs.Lines.Add('Texture ('+IntToStr(ARow)+','+IntToStr(ACol)+') '+intToStr(index));
-     if index<n then
+     index := ARow*dgTextures.ColCount+ACol-1;
+
+     if (index>=0) and (index<n) then
      begin
        if RayTracer_GetTextureSize(index,width,height,depth)=0 then
        begin
@@ -1636,7 +1627,6 @@ begin
 
          RayTracer_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
          dgTextures.Canvas.StretchDraw(Rect,FTexturePreview);
-         ConvertFromBGRtoRGB(FTexturePreview);
        end;
      end;
   end;
@@ -1644,8 +1634,16 @@ end;
 
 procedure TmainForm.dgTexturesSelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
+var
+  index,n: integer;
 begin
-  FCurrentSelectedTextureId := ARow*dgTextures.ColCount+ACol;
+  n := RayTracer_GetNbTextures;
+  index := ARow*dgTextures.ColCount+ACol-1;
+  if index<n then
+  begin
+    FCurrentSelectedTextureId := ARow*dgTextures.ColCount+ACol-1;
+    memLogs.Lines.Add('CurrentSelectedTextureId='+inttostr(FCurrentSelectedTextureId));
+  end;
 end;
 
 procedure TmainForm.edtMoleculeIdExit(Sender: TObject);
@@ -1740,11 +1738,8 @@ end;
 
 procedure TmainForm.Specular1Click(Sender: TObject);
 begin
-  if FCurrentSelectedTextureId<>TEXTURE_NONE then
-  begin
-    FCurrentMaterial.specularTextureId := FCurrentSelectedTextureId;
-    updateMaterial;
-  end;
+  FCurrentMaterial.specularTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
 end;
 
 procedure TmainForm.setMaterialControls;
@@ -1861,18 +1856,13 @@ var
   n : integer;
 begin
   n := RayTracer_GetNbTextures;
-  dgTextures.RowCount := n div dgTextures.ColCount;
-  memLogs.Lines.Add(intToStr(n) + ' textures available');
+  dgTextures.RowCount := (n div dgTextures.ColCount)+1;
+  dgTextures.Refresh;
 end;
 
 procedure TmainForm.activateTextureTab(Sender: TObject);
 begin
   pgParameters.ActivePage := tsTextures;
-end;
-
-procedure TmainForm.ConvertFromBGRtoRGB;
-begin
-  FTexturePreview.c
 end;
 
 end.

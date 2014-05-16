@@ -87,6 +87,8 @@ const
   YELLOW_MATERIAL               = NB_MAX_MATERIALS-39;
   PURPLE_MATERIAL               = NB_MAX_MATERIALS-40;
 
+  SKYBOX_SPHERE_MATERIAL        = NB_MAX_MATERIALS-41;
+
 Type
   T3DPoint = record
     x: double;

@@ -8159,7 +8159,7 @@ object mainForm: TmainForm
       Top = 1
       Width = 237
       Height = 656
-      ActivePage = tsMaterial
+      ActivePage = tsScene
       Align = alClient
       TabOrder = 0
       object tsControls: TTabSheet
@@ -8557,9 +8557,9 @@ object mainForm: TmainForm
             Width = 122
             Height = 21
             Style = csDropDownList
-            ItemIndex = 1
+            ItemIndex = 3
             TabOrder = 0
-            Text = 'Wall'
+            Text = 'Ground'
             OnChange = cbSceneChange
             Items.Strings = (
               'None'
@@ -9046,9 +9046,6 @@ object mainForm: TmainForm
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
-          ExplicitLeft = 56
-          ExplicitTop = 576
-          ExplicitWidth = 185
           object btnAddTexture: TButton
             Left = 80
             Top = 6

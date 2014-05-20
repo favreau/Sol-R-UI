@@ -151,8 +151,8 @@ Type
     wireframe : integer;
     wireframeDepth : integer;
     diffuseTextureId : integer;
-    bumpTextureId : integer;
     normalTextureId : integer;
+    bumpTextureId : integer;
     specularTextureId : integer;
     reflectionTextureId : integer;
     transparencyTextureId : integer;
@@ -212,7 +212,7 @@ Procedure RayTracer_SetCamera(
 Function RayTracer_RunKernel(timer : Double; image : Pointer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
 // ---------- Primitives ----------
-Function RayTracer_AddPrimitive( aType : integer ) : Integer; cdecl; external RAYTRACERMODULE_DLL;
+Function RayTracer_AddPrimitive( aType : integer; movable : integer ) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
 Function RayTracer_SetPrimitive(
    index: Integer;
@@ -289,12 +289,8 @@ Function RayTracer_GetMaterial(
    var procedural : integer;
    var wireframe    : Integer; var wireframeDepth: Integer;
    var transparency : Double;
-   var diffuseTextureId : Integer;
-   var normalTextureId : Integer;
-   var bumpTextureId : Integer;
-   var specularTextureId : Integer;
-   var reflectionTextureId : Integer;
-   var transparencyTrextureId : Integer;
+   var diffuseTextureId : Integer; var normalTextureId : Integer; var bumpTextureId : Integer;
+   var specularTextureId : Integer; var reflectionTextureId : Integer; var transparencyTrextureId : Integer;
    var specValue: double; var specPower: double; var specCoef: double;
    var innerIllumination: double; var illuminationDiffusion: double; var illuminationPropagation : double;
    var fastTransparency: Integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;

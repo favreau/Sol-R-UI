@@ -39,17 +39,15 @@ type
     sdSaveFile: TSaveDialog;
     miSave: TMenuItem;
     memLogs: TMemo;
-    Panel3: TPanel;
+    pnlPageControls: TPanel;
     pgParameters: TPageControl;
-    tsControls: TTabSheet;
-    rgMouseControls: TRadioGroup;
     tsScene: TTabSheet;
-    GroupBox4: TGroupBox;
+    gb3DVision: TGroupBox;
     lbl3DVisionType: TLabel;
     lbl3DVisionStrength: TLabel;
     cb3DVision: TComboBox;
     sbWith3DVision: TScrollBar;
-    GroupBox3: TGroupBox;
+    gbShadows: TGroupBox;
     lblRayIterations: TLabel;
     lblViewDistance: TLabel;
     sbRayInterations: TScrollBar;
@@ -62,7 +60,7 @@ type
     cbPostProcessing: TComboBox;
     sbPPIntensity: TScrollBar;
     rgMisc: TRadioGroup;
-    GroupBox1: TGroupBox;
+    gbEnvironment: TGroupBox;
     shBackgroundColor: TShape;
     Label14: TLabel;
     Label15: TLabel;
@@ -98,40 +96,6 @@ type
     sbRefraction: TScrollBar;
     sbNoise: TScrollBar;
     cbFastTransparency: TCheckBox;
-    tsObject: TTabSheet;
-    gbCoordinates: TGroupBox;
-    Label19: TLabel;
-    Label20: TLabel;
-    Label21: TLabel;
-    seCenterX: TSpinEdit;
-    seCenterY: TSpinEdit;
-    seCenterZ: TSpinEdit;
-    seOtherCenterX: TSpinEdit;
-    seOtherCenterY: TSpinEdit;
-    seOtherCenterZ: TSpinEdit;
-    gbMaterial: TGroupBox;
-    Label22: TLabel;
-    seMaterialId: TSpinEdit;
-    GroupBox2: TGroupBox;
-    Label25: TLabel;
-    Label26: TLabel;
-    Label27: TLabel;
-    seSizeX: TSpinEdit;
-    seSizeY: TSpinEdit;
-    seSizeZ: TSpinEdit;
-    gbTextures: TGroupBox;
-    gbPDB: TGroupBox;
-    Label29: TLabel;
-    Label30: TLabel;
-    sbDefaultAtomSize: TScrollBar;
-    sbStickSize: TScrollBar;
-    cbGeometryType: TComboBox;
-    cbRepresentation: TComboBox;
-    cbTheme: TComboBox;
-    GroupBox5: TGroupBox;
-    Label18: TLabel;
-    btnOpen: TButton;
-    edtMoleculeId: TMaskEdit;
     lblPrimitiveID: TLabel;
     lblReflectionValue: TLabel;
     lblTransparencyValue: TLabel;
@@ -175,6 +139,20 @@ type
     miTransparentTexture: TMenuItem;
     pnlManageTextures: TPanel;
     btnAddTexture: TButton;
+    tsControls: TTabSheet;
+    rgMouseControls: TRadioGroup;
+    gbPDB: TGroupBox;
+    Label29: TLabel;
+    Label30: TLabel;
+    sbDefaultAtomSize: TScrollBar;
+    sbStickSize: TScrollBar;
+    cbGeometryType: TComboBox;
+    cbRepresentation: TComboBox;
+    cbTheme: TComboBox;
+    gbOnlinePDB: TGroupBox;
+    Label18: TLabel;
+    btnOpen: TButton;
+    edtMoleculeId: TMaskEdit;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -214,7 +192,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure cbGeometryTypeChange(Sender: TObject);
     procedure cbRepresentationChange(Sender: TObject);
-    procedure updateObjectAttributes(Sender: TObject);
     procedure cbFastTransparencyClick(Sender: TObject);
     procedure cbFogEffectClick(Sender: TObject);
     procedure cbThemeChange(Sender: TObject);
@@ -282,7 +259,6 @@ type
 
     { Controls }
     procedure setMaterialControls;
-    procedure updatePrimitiveControls;
 
     {textures}
     procedure loadTextures( filter: string );
@@ -324,8 +300,8 @@ type
     FCurrentMaterialId    : integer;
     FCurrentMaterial      : TMaterial;
     FCurrentPrimitive     : integer;
-    FCurrentSelectedTextureId: integer;
     FControlUpdate        : boolean;
+    FCurrentSelectedTextureId: integer;
 
     {Models}
     nbPrimitives : integer;
@@ -386,8 +362,6 @@ begin
   loadTextures('*.bmp');
   loadTextures('*.jpg');
   loadTextures('*.tga');
-
-  updateTextureControls;
 
   i := RayTracer_GetNbTextures;
   memLogs.Lines.Add( IntToStr(i) + ' textures loaded');
@@ -464,7 +438,7 @@ begin
     refraction   := 0;
     transparency := 0;
     innerIllumination       := 0;
-    illuminationDiffusion   := sbViewDistance.Position*5000;
+    illuminationDiffusion   := sbViewDistance.Position*1000;
     illuminationPropagation := sbViewDistance.Position*5000;
     procedural   := false;
     noise := 0;
@@ -628,7 +602,7 @@ begin
   previousMouseY := 0;
 
   pathTracingIteration := 0;
-  postProcessingParam := 0;
+  postProcessingParam := 10000;
 
   initializeMaterials;
   updateMaterials;
@@ -647,7 +621,7 @@ begin
       cbPostProcessing.itemIndex,
       postProcessingParam,
       sbPPIntensity.Position*50,
-      sbPPIntensity.Position );
+      sbPPIntensity.Position);
 
     RayTracer_SetCamera(
       viewPos.x, viewPos.y, viewPos.z,
@@ -773,8 +747,6 @@ begin
    imgSpecularTexture.Picture.Assign(imgNone.Picture);
    imgReflectionTexture.Picture.Assign(imgNone.Picture);
    imgTransparencyTexture.Picture.Assign(imgNone.Picture);
-
-    pgParameters.ActivePage := tsControls;
 end;
 
 procedure TmainForm.FormDestroy(Sender: TObject);
@@ -788,7 +760,6 @@ begin
   ApplicationFolder := ExtractFileDir(Application.ExeName) + '\';
   pgParameters.Enabled := false;
   tsMaterial.Enabled := false;
-  tsObject.Enabled := false;
   SceneInitialized := false;
   currentModel.modelType := mtNone;
 end;
@@ -1005,10 +976,10 @@ procedure TmainForm.cbContinuousRenderingClick(Sender: TObject);
 begin
   if( cbContinuousRendering.Checked ) then
   begin
-    maxPathTracingIterations := 100;
-    timer.Enabled := true;
-  end
-  else
+      maxPathTracingIterations := pbProcessing.Max;
+      timer.Enabled := true;
+    end
+    else
     maxPathTracingIterations := 1;
 end;
 
@@ -1156,7 +1127,6 @@ begin
     setMaterialControls;
 
     tsMaterial.Enabled := true;
-    tsObject.Enabled := true;
     pgParameters.ActivePage := tsMaterial;
   end;
 end;
@@ -1177,7 +1147,6 @@ begin
       begin
         FCurrentMaterialId := RayTracer_GetPrimitiveMaterial(FCurrentPrimitive);
         updateMaterialControls;
-        updatePrimitiveControls;
         pathTracingIteration := 0;
       end;
       3: // Post processing effetcs
@@ -1191,7 +1160,6 @@ begin
   else
   begin
     tsMaterial.Enabled := false;
-    tsObject.Enabled := false;
   end;
 
 end;
@@ -1265,6 +1233,8 @@ begin
   cbContinuousRendering.Checked := false;
   SceneInitialized := false;
   Screen.Cursor := crHourGlass;
+  pgParameters.ActivePage := tsControls;
+
   groundHeight := -2510;
   tiles:=20;
 
@@ -1286,8 +1256,10 @@ begin
       RayTracer_LoadFromFile( currentModel.Filename, 5000 );
   end;
 
+  updateTextureControls;
+
   // Light
-  lamp := RayTracer_AddPrimitive(integer(ptSphere));
+  lamp := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
   RayTracer_SetPrimitive(
     lamp,
     lampPos.x, lampPos.y, lampPos.z,
@@ -1297,73 +1269,76 @@ begin
     DEFAULT_LIGHT_MATERIAL);
 
   // Create Scene
-  boxSize:=20000;
+  boxSize:=50000;
   case cbScene.ItemIndex of
     0: ;// nothing
-    1: // Wall
+    1: // Ground
     begin
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, -boxSize, -boxSize, boxSize, boxSize, -boxSize, boxSize, boxSize,  boxSize, boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,  boxSize,  boxSize, boxSize,-boxSize,  boxSize, boxSize,-boxSize, -boxSize, boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-    end;
-    2: // Water ball
-    begin
-      boxSize:=60000;
-      primitiveId := RayTracer_AddPrimitive(integer(ptSphere));
-      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
-    end;
-    3: // Ground
-    begin
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+    end;
+    2: // Skymap
+    begin
+      primitiveId := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
+      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
+    end;
+    3: // Skymap and Ground
+    begin
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
+      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+
+      primitiveId := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
+      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
     end;
     4: // Cornell Box
     begin
       boxSize := 10000;
       // Ground
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
 
       groundHeight := groundHeight+boxSize;
       // Front
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
 
       // Right
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
@@ -1382,109 +1357,27 @@ begin
       }
 
       // Left
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
 
       // Top
       // Ground
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
+      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
       RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-    end;
-    5: // SkyBox
-    begin
-      boxSize := 5000;
-      tiles:=4;
-      // Ground
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
-
-      boxSize := 25000;
-      // Front
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, SKYBOX_FRONT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, SKYBOX_FRONT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-
-      // Right
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, SKYBOX_RIGHT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, SKYBOX_RIGHT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-
-      // Back
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, SKYBOX_BACK_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight-boxSize,-boxSize, 0,0,0, SKYBOX_BACK_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-
-      // Left
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, SKYBOX_LEFT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, SKYBOX_LEFT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-
-      // Top
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight+boxSize, -boxSize, boxSize, groundHeight+boxSize,-boxSize, boxSize, groundHeight+boxSize,  boxSize, 0,0,0, SKYBOX_TOP_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,1,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight+boxSize, boxSize, -boxSize, groundHeight+boxSize, boxSize, -boxSize, groundHeight+boxSize,-boxSize, 0,0,0, SKYBOX_TOP_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0,0,0,0);
-
-      // Bottom
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight-boxSize, -boxSize, boxSize, groundHeight-boxSize,-boxSize, boxSize, groundHeight-boxSize,  boxSize, 0,0,0, SKYBOX_BOTTOM_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,1,0,1,1,0);
-
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight-boxSize, boxSize, -boxSize, groundHeight-boxSize, boxSize, -boxSize, groundHeight-boxSize,-boxSize, 0,0,0, SKYBOX_BOTTOM_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0,0,0,0);
     end;
   end;
 
@@ -1502,13 +1395,16 @@ end;
 
 procedure TmainForm.btnAddTextureClick(Sender: TObject);
 var
-  n: integer;
+  i,n: integer;
 begin
   if odImage.Execute then
   begin
-    n := RayTracer_GetNbTextures;
-    RayTracer_LoadTextureFromFile(n,AnsiString(odImage.FileName));
-    memLogs.Lines.Add(odImage.FileName + ' loaded');
+    for i := 0 to odImage.Files.Count-1 do
+    begin
+      n := RayTracer_GetNbTextures;
+      RayTracer_LoadTextureFromFile(n,AnsiString(odImage.Files[i]));
+      memLogs.Lines.Add(odImage.FileName + ' loaded');
+    end;
     updateTextureControls;
     dgTextures.SetFocus;
   end;
@@ -1641,7 +1537,7 @@ begin
   index := ARow*dgTextures.ColCount+ACol-1;
   if index<n then
   begin
-    FCurrentSelectedTextureId := ARow*dgTextures.ColCount+ACol-1;
+    FCurrentSelectedTextureId := index;
     memLogs.Lines.Add('CurrentSelectedTextureId='+inttostr(FCurrentSelectedTextureId));
   end;
 end;
@@ -1659,58 +1555,6 @@ end;
 procedure TmainForm.cbMaterialColorChange(Sender: TObject);
 begin
   updateMaterial;
-end;
-
-procedure TmainForm.updateObjectAttributes(Sender: TObject);
-begin
-  if( FCurrentPrimitive<>PRIMITIVE_NONE ) and ( not FControlUpdate ) then
-  begin
-    RayTracer_SetPrimitive(
-      FCurrentPrimitive,
-      seCenterX.Value, seCenterY.Value, seCenterZ.Value,
-      seOtherCenterX.Value, seOtherCenterY.Value, seOtherCenterZ.Value,
-      0,0,0,
-      seSizeX.Value, seSizeY.Value, seSizeZ.Value,
-      seMaterialId.Value );
-    RayTracer_CompactBoxes(false);
-    updateScene;
-  end;
-end;
-
-procedure TmainForm.updatePrimitiveControls;
-var
-  primitive: TPrimitive;
-begin
-  FControlUpdate := true;
-
-  // Primitive
-  if( RayTracer_GetPrimitive(
-    FCurrentPrimitive,
-    primitive.p0.x,primitive.p0.y,primitive.p0.z,
-    primitive.p1.x,primitive.p1.y,primitive.p1.z,
-    primitive.p2.x,primitive.p2.y,primitive.p2.z,
-    primitive.size.x,primitive.size.y,primitive.size.z,
-    primitive.materialId) = 0 ) then
-  begin
-    //setPrimitiveControls(primitive);
-  end;
-
-  seCenterX.Value := trunc(primitive.p0.x);
-  seCenterY.Value := trunc(primitive.p0.y);
-  seCenterZ.Value := trunc(primitive.p0.z);
-
-  seOtherCenterX.Value := trunc(primitive.p1.x);
-  seOtherCenterY.Value := trunc(primitive.p1.y);
-  seOtherCenterZ.Value := trunc(primitive.p1.z);
-
-  seSizeX.Value := trunc(primitive.Size.x);
-  seSizeY.Value := trunc(primitive.Size.y);
-  seSizeZ.Value := trunc(primitive.Size.z);
-
-  seMaterialId.Value := primitive.materialId;
-
-  //tsObject.Enabled := true;
-  FControlUpdate := false;
 end;
 
 procedure TmainForm.shBackgroundColorMouseDown(Sender: TObject;

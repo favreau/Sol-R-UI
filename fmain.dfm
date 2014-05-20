@@ -8147,7 +8147,7 @@ object mainForm: TmainForm
       end
     end
   end
-  object Panel3: TPanel
+  object pnlPageControls: TPanel
     Left = 0
     Top = 65
     Width = 239
@@ -8161,6 +8161,8 @@ object mainForm: TmainForm
       Height = 656
       ActivePage = tsScene
       Align = alClient
+      DoubleBuffered = False
+      ParentDoubleBuffered = False
       TabOrder = 0
       object tsControls: TTabSheet
         Caption = 'Controls'
@@ -8275,7 +8277,7 @@ object mainForm: TmainForm
               'QuteMol')
           end
         end
-        object GroupBox5: TGroupBox
+        object gbOnlinePDB: TGroupBox
           Left = 0
           Top = 127
           Width = 229
@@ -8320,7 +8322,7 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
-        object GroupBox4: TGroupBox
+        object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3
           Top = 288
@@ -8370,7 +8372,7 @@ object mainForm: TmainForm
             OnChange = sbWith3DVisionChange
           end
         end
-        object GroupBox3: TGroupBox
+        object gbShadows: TGroupBox
           AlignWithMargins = True
           Left = 3
           Top = 87
@@ -8512,7 +8514,7 @@ object mainForm: TmainForm
           TabOrder = 3
           OnClick = rgMiscClick
         end
-        object GroupBox1: TGroupBox
+        object gbEnvironment: TGroupBox
           Left = 0
           Top = 0
           Width = 229
@@ -8557,17 +8559,16 @@ object mainForm: TmainForm
             Width = 122
             Height = 21
             Style = csDropDownList
-            ItemIndex = 3
+            ItemIndex = 0
             TabOrder = 0
-            Text = 'Ground'
+            Text = 'None'
             OnChange = cbSceneChange
             Items.Strings = (
               'None'
-              'Wall'
-              'Water bubble'
               'Ground'
-              'Cornell Box'
-              'SkyBox')
+              'Skymap'
+              'Skymap and Ground'
+              'Cornell Box')
           end
         end
         object gbHelpers: TGroupBox
@@ -9057,214 +9058,6 @@ object mainForm: TmainForm
           end
         end
       end
-      object tsObject: TTabSheet
-        Caption = 'Object'
-        ImageIndex = 6
-        object gbCoordinates: TGroupBox
-          Left = 0
-          Top = 0
-          Width = 229
-          Height = 121
-          Align = alTop
-          Caption = 'Coordinates'
-          TabOrder = 0
-          object Label19: TLabel
-            Left = 8
-            Top = 27
-            Width = 7
-            Height = 13
-            Caption = 'X'
-          end
-          object Label20: TLabel
-            Left = 8
-            Top = 55
-            Width = 7
-            Height = 13
-            Caption = 'Y'
-          end
-          object Label21: TLabel
-            Left = 8
-            Top = 83
-            Width = 7
-            Height = 13
-            Caption = 'Z'
-          end
-          object seCenterX: TSpinEdit
-            Left = 47
-            Top = 24
-            Width = 73
-            Height = 22
-            Increment = 100
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 0
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seCenterY: TSpinEdit
-            Left = 48
-            Top = 52
-            Width = 73
-            Height = 22
-            Increment = 100
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 1
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seCenterZ: TSpinEdit
-            Left = 48
-            Top = 80
-            Width = 73
-            Height = 22
-            Increment = 100
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 2
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seOtherCenterX: TSpinEdit
-            Left = 135
-            Top = 24
-            Width = 73
-            Height = 22
-            Increment = 100
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 3
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seOtherCenterY: TSpinEdit
-            Left = 136
-            Top = 52
-            Width = 73
-            Height = 22
-            Increment = 100
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 4
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seOtherCenterZ: TSpinEdit
-            Left = 136
-            Top = 80
-            Width = 73
-            Height = 22
-            Increment = 100
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 5
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-        end
-        object gbMaterial: TGroupBox
-          Left = 0
-          Top = 242
-          Width = 229
-          Height = 61
-          Align = alTop
-          Caption = 'Material'
-          TabOrder = 1
-          object Label22: TLabel
-            Left = 8
-            Top = 27
-            Width = 12
-            Height = 13
-            Caption = 'Id:'
-          end
-          object seMaterialId: TSpinEdit
-            Left = 64
-            Top = 24
-            Width = 73
-            Height = 22
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 0
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-        end
-        object GroupBox2: TGroupBox
-          Left = 0
-          Top = 121
-          Width = 229
-          Height = 121
-          Align = alTop
-          Caption = 'Size'
-          TabOrder = 2
-          object Label25: TLabel
-            Left = 8
-            Top = 27
-            Width = 7
-            Height = 13
-            Caption = 'X'
-          end
-          object Label26: TLabel
-            Left = 8
-            Top = 55
-            Width = 7
-            Height = 13
-            Caption = 'Y'
-          end
-          object Label27: TLabel
-            Left = 8
-            Top = 83
-            Width = 7
-            Height = 13
-            Caption = 'Z'
-          end
-          object seSizeX: TSpinEdit
-            Left = 48
-            Top = 24
-            Width = 73
-            Height = 22
-            Increment = 10
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 0
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seSizeY: TSpinEdit
-            Left = 48
-            Top = 52
-            Width = 73
-            Height = 22
-            Increment = 10
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 1
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object seSizeZ: TSpinEdit
-            Left = 48
-            Top = 80
-            Width = 73
-            Height = 22
-            Increment = 10
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 2
-            Value = 0
-            OnChange = updateObjectAttributes
-          end
-          object gbTextures: TGroupBox
-            Left = 2
-            Top = 15
-            Width = 225
-            Height = 104
-            Align = alClient
-            Caption = 'Textures'
-            TabOrder = 3
-          end
-        end
-      end
     end
   end
   object pnlSystem: TPanel
@@ -9394,6 +9187,7 @@ object mainForm: TmainForm
   end
   object odImage: TOpenDialog
     Filter = 'Supported formats|*.png;*.jpg;*.bmp'
+    Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
     Title = 'Open file'
     Left = 320
     Top = 248
@@ -9405,13 +9199,13 @@ object mainForm: TmainForm
       Caption = 'Diffuse'
       OnClick = miDiffuseTextureClick
     end
-    object miBumpTexture: TMenuItem
-      Caption = 'Bump'
-      OnClick = miBumpTextureClick
-    end
     object miNormalTexture: TMenuItem
       Caption = 'Normal'
       OnClick = miNormalTextureClick
+    end
+    object miBumpTexture: TMenuItem
+      Caption = 'Bump'
+      OnClick = miBumpTextureClick
     end
     object Specular1: TMenuItem
       Caption = 'Specular'

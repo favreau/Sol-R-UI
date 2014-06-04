@@ -3,7 +3,7 @@
         <ProjectGuid>{674624EC-387B-496B-B8B2-A1079371EF34}</ProjectGuid>
         <MainSource>SoL_R_Editor.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">CUDA Release</Config>
+        <Config Condition="'$(Config)'==''">OpenCL Release</Config>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -123,6 +123,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <PostBuildEvent><![CDATA[copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_Cuda$(OUTPUTEXT)
+$(PostBuildEvent)]]></PostBuildEvent>
+        <Debugger_RunParams>_-objFile=&quot;E:\Deployments\bin\irt\africanboy.irt&quot;</Debugger_RunParams>
         <DCC_Define>CUDA;$(DCC_Define)</DCC_Define>
         <DCC_ExeOutput>E:\Deployments\bin\</DCC_ExeOutput>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -140,11 +143,20 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <PostBuildEvent><![CDATA[copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_Cuda_d$(OUTPUTEXT)
+$(PostBuildEvent)]]></PostBuildEvent>
+        <Debugger_RunParams>-objFile=&quot;E:\Deployments\bin\obj\african boy-obj.obj&quot;</Debugger_RunParams>
         <DCC_Define>CUDA;$(DCC_Define)</DCC_Define>
         <DCC_DcuOutput>.\dcu\x64</DCC_DcuOutput>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_ExeOutput>E:\Deployments\bin\</DCC_ExeOutput>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_6)'!=''">
+        <Manifest_File>None</Manifest_File>
+        <PostBuildEvent><![CDATA[copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_OpenCL$(OUTPUTEXT)
+$(PostBuildEvent)]]></PostBuildEvent>
+        <PostBuildEventCancelOnError>false</PostBuildEventCancelOnError>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_6_Win64)'!=''">
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
@@ -158,6 +170,8 @@
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_3_Win64)'!=''">
+        <PostBuildEvent><![CDATA[copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_OpenCL_d$(OUTPUTEXT)
+$(PostBuildEvent)]]></PostBuildEvent>
         <DCC_DcuOutput>.\dcu\x64</DCC_DcuOutput>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -171,6 +185,12 @@
             <Form>mainForm</Form>
         </DCCReference>
         <DCCReference Include="RayTracingEngineStub.pas"/>
+        <DCCReference Include="fOpenCLSettings.pas">
+            <Form>frmOpenCLSettings</Form>
+        </DCCReference>
+        <DCCReference Include="fAbout.pas">
+            <Form>frmAbout</Form>
+        </DCCReference>
         <RcItem Include="SoL_R_Editor_Icon.ico">
             <ResourceType>ICON</ResourceType>
             <ResourceId>Icon_1</ResourceId>
@@ -231,6 +251,7 @@
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteExpressPkg_Design170.bpl">File C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteExpressPkg_Design170.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -246,4 +267,44 @@
     </ProjectExtensions>
     <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
     <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <PropertyGroup Condition="'$(Config)'=='CUDA Release' And '$(Platform)'=='Win64'">
+        <PreBuildEvent/>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent>copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_Cuda$(OUTPUTEXT)</PostBuildEvent>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='CUDA Debug' And '$(Platform)'=='Win64'">
+        <PreBuildEvent/>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent>copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_Cuda_d$(OUTPUTEXT)</PostBuildEvent>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='OpenCL Release' And '$(Platform)'=='Win32'">
+        <PreBuildEvent/>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent>copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_OpenCL$(OUTPUTEXT)</PostBuildEvent>
+        <PostBuildEventIgnoreExitCode>True</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='OpenCL Release' And '$(Platform)'=='Win64'">
+        <PreBuildEvent/>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent>copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_OpenCL$(OUTPUTEXT)</PostBuildEvent>
+        <PostBuildEventIgnoreExitCode>True</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='OpenCL Debug' And '$(Platform)'=='Win64'">
+        <PreBuildEvent/>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent>copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_OpenCL_d$(OUTPUTEXT)</PostBuildEvent>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
 </Project>

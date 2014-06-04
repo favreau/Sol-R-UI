@@ -8,7 +8,7 @@ uses
   VCLTee.TeCanvas, Vcl.ColorGrd, Vcl.Ribbon, Vcl.RibbonLunaStyleActnCtrls,
   Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnList, Vcl.Mask, Vcl.Samples.Spin, Vcl.ActnColorMaps,
-  Vcl.Buttons, Vcl.Menus, Vcl.ImgList, Vcl.Grids;
+  Vcl.Buttons, Vcl.Menus, Vcl.ImgList, Vcl.Grids, Vcl.ButtonGroup;
 
 type
   TModelType = ( mtNone = 0, mtPDB = 1, mtOBJ = 2, mtIRT );
@@ -26,9 +26,8 @@ type
     pnlCenter: TPanel;
     img3DView: TImage;
     odOpenFile: TOpenDialog;
-    Panel1: TPanel;
+    pnlControlButtons: TPanel;
     pbProcessing: TProgressBar;
-    lblPathTracingIterations: TLabel;
     lblElements: TLabel;
     MainMenu: TMainMenu;
     File1: TMenuItem;
@@ -67,24 +66,10 @@ type
     cbScene: TComboBox;
     gbHelpers: TGroupBox;
     cbBoundingBoxes: TCheckBox;
-    cbContinuousRendering: TCheckBox;
     tsMaterial: TTabSheet;
     gbMaterialColor: TGroupBox;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
     shMaterialColor: TShape;
-    Label28: TLabel;
-    Label1: TLabel;
-    Label2: TLabel;
-    sbSpecValue: TScrollBar;
-    sbSpecPower: TScrollBar;
-    sbSpecCoef: TScrollBar;
-    sbInnerIllumination: TScrollBar;
     Button2: TButton;
-    sbIlluminationPropagation: TScrollBar;
-    sbIlluminationDiffusion: TScrollBar;
     gbBasicParameters: TGroupBox;
     Label7: TLabel;
     Label8: TLabel;
@@ -97,10 +82,6 @@ type
     sbNoise: TScrollBar;
     cbFastTransparency: TCheckBox;
     lblPrimitiveID: TLabel;
-    lblReflectionValue: TLabel;
-    lblTransparencyValue: TLabel;
-    lblRefractionValue: TLabel;
-    lblNoiseValue: TLabel;
     gbTextureIds: TGroupBox;
     Label40: TLabel;
     Label39: TLabel;
@@ -111,13 +92,8 @@ type
     cbDoubleSidedTriangles: TCheckBox;
     cbGradientBackGround: TCheckBox;
     cbAdvancedRenderingFeatures: TCheckBox;
-    pnlSystem: TPanel;
-    lblPlatforms: TLabel;
-    cbPlatforms: TComboBox;
-    lblDevices: TLabel;
-    cbDevices: TComboBox;
     cbDraftMode: TCheckBox;
-    miScreenshot: TMenuItem;
+    miHiResScreenshot: TMenuItem;
     N2: TMenuItem;
     cbCastShadows: TCheckBox;
     odImage: TOpenDialog;
@@ -153,6 +129,38 @@ type
     Label18: TLabel;
     btnOpen: TButton;
     edtMoleculeId: TMaskEdit;
+    sbAmbientLightIntensity: TScrollBar;
+    Label11: TLabel;
+    sbOpacity: TScrollBar;
+    miHelp: TMenuItem;
+    miAbout: TMenuItem;
+    meReflection: TMaskEdit;
+    meTransparency: TMaskEdit;
+    meRefraction: TMaskEdit;
+    meNoise: TMaskEdit;
+    meOpacity: TMaskEdit;
+    btnRecompileKernels: TButton;
+    cbContinuousRendering: TCheckBox;
+    gbIllumination: TGroupBox;
+    Label6: TLabel;
+    sbInnerIllumination: TScrollBar;
+    meInnerIllumination: TMaskEdit;
+    sbIlluminationDiffusion: TScrollBar;
+    Label2: TLabel;
+    Label1: TLabel;
+    sbIlluminationPropagation: TScrollBar;
+    gbSpecularity: TGroupBox;
+    sbSpecValue: TScrollBar;
+    Label3: TLabel;
+    Label4: TLabel;
+    sbSpecPower: TScrollBar;
+    meSpecPower: TMaskEdit;
+    meSpecValue: TMaskEdit;
+    sbCamera: TSpeedButton;
+    sbMaterial: TSpeedButton;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    miLowResScreenshot: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -174,8 +182,6 @@ type
     procedure cbBoundingBoxesClick(Sender: TObject);
     procedure img3DViewMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure img3DViewMouseown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure img3DViewMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -189,7 +195,6 @@ type
     procedure sbDefaultAtomSizeChange(Sender: TObject);
     procedure cbContinuousRenderingClick(Sender: TObject);
     procedure sbStickSizeChange(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure cbGeometryTypeChange(Sender: TObject);
     procedure cbRepresentationChange(Sender: TObject);
     procedure cbFastTransparencyClick(Sender: TObject);
@@ -214,9 +219,8 @@ type
     procedure cbGraphicsLevelChange(Sender: TObject);
     procedure sbDiffuseTextureIdChange(Sender: TObject);
     procedure cbDoubleSidedTrianglesClick(Sender: TObject);
-    procedure cbPlatformsChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure miScreenshotClick(Sender: TObject);
+    procedure miHiResScreenshotClick(Sender: TObject);
     procedure btnLoadTextureClick(Sender: TObject);
     procedure dgTexturesDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
@@ -235,9 +239,32 @@ type
     procedure imgSpecularTextureClick(Sender: TObject);
     procedure imgReflectionTextureClick(Sender: TObject);
     procedure imgTransparencyTextureClick(Sender: TObject);
+    procedure sbAmbientLightIntensityChange(Sender: TObject);
+    procedure sbOpacityChange(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure meReflectionExit(Sender: TObject);
+    procedure meSpecCoefExit(Sender: TObject);
+    procedure meSpecValueExit(Sender: TObject);
+    procedure meInnerIlluminationExit(Sender: TObject);
+    procedure btnRecompileKernelsClick(Sender: TObject);
+    procedure meTransparencyExit(Sender: TObject);
+    procedure meRefractionExit(Sender: TObject);
+    procedure meNoiseExit(Sender: TObject);
+    procedure meOpacityExit(Sender: TObject);
+    procedure img3DViewMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure bgControlsItems0Click(Sender: TObject);
+    procedure bgControlsItems1Click(Sender: TObject);
+    procedure bgControlsItems2Click(Sender: TObject);
+    procedure bgControlsItems3Click(Sender: TObject);
+    procedure sbCameraClick(Sender: TObject);
+    procedure sbMaterialClick(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure miLowResScreenshotClick(Sender: TObject);
   private
     { Private declarations }
-    pathTracingIteration : integer;
+    FPathTracingIteration : integer;
 
     procedure updateScene;
     procedure updateWorld;
@@ -312,8 +339,14 @@ type
     FTexturePreview : TBitmap;
 
     {rendering}
-    maxPathTracingIterations: integer;
+    FMaxPathTracingIterations: integer;
     SceneInitialized : boolean;
+
+{$ifndef CUDA}
+  private
+    FOCLPlatform : integer;
+    FOCLDevice   : integer;
+{$endif}
 
   private
     {Folders}
@@ -325,7 +358,13 @@ var
 
 implementation
 
-uses Math,idHTTP,System.UITypes;
+uses
+{$ifndef CUDA}
+  fOpenCLSettings,
+{$endif}
+  fAbout,
+  Math,idHTTP,
+  System.UITypes,strUtils;
 
 {$R *.dfm}
 
@@ -374,6 +413,7 @@ procedure TmainForm.Open1Click(Sender: TObject);
 var
   fileExtension: string;
 begin
+  odOpenFile.Filter := 'Supported formats|*.irt;*.obj;*.pdb';
   odOpenFile.InitialDir := ApplicationFolder + irtFolder;
   if odOpenFile.Execute then
   begin
@@ -420,7 +460,8 @@ var
   specularTextureId: integer;
   reflectionTextureId: integer;
   transparencyTextureId: integer;
-  wireFrame: boolean;
+  wireFrame: integer;
+  opacity: double;
 begin
   FControlUpdate := false;
   FCurrentMaterialId := MATERIAL_NONE;
@@ -438,15 +479,16 @@ begin
     refraction   := 0;
     transparency := 0;
     innerIllumination       := 0;
-    illuminationDiffusion   := sbViewDistance.Position*1000;
-    illuminationPropagation := sbViewDistance.Position*5000;
+    illuminationDiffusion   := sbViewDistance.Position*500;
+    illuminationPropagation := sbViewDistance.Position*500;
     procedural   := false;
     noise := 0;
     specular.x := 0.5;
     specular.y := 50;
     specular.z := 0;
     fastTransparency := false;
-    wireFrame := false;
+    wireFrame := 0;
+    opacity := sbViewDistance.Position*500;
 
     r := 0.5+random(40)/100;
     g := 0.5+random(40)/100;
@@ -505,12 +547,12 @@ begin
       CORNELLBOX_BACK_MATERIAL : begin r:=92/255;  g:=93/255;  b:=150/255; end;
       CORNELLBOX_LEFT_MATERIAL : begin r:=92/255;  g:=150/255; b:=93/255; end;
 
-      SKYBOX_FRONT_MATERIAL : begin diffuseTextureId:=0; wireFrame:=true; end;
-      SKYBOX_LEFT_MATERIAL  : begin diffuseTextureId:=1; wireFrame:=true; end;
-      SKYBOX_BACK_MATERIAL  : begin diffuseTextureId:=2; wireFrame:=true; end;
-      SKYBOX_RIGHT_MATERIAL : begin diffuseTextureId:=3; wireFrame:=true; end;
-      SKYBOX_TOP_MATERIAL   : begin diffuseTextureId:=4; wireFrame:=true; end;
-      SKYBOX_BOTTOM_MATERIAL: begin diffuseTextureId:=5; wireFrame:=true; end;
+      SKYBOX_FRONT_MATERIAL : begin diffuseTextureId:=0; wireFrame:=1; end;
+      SKYBOX_LEFT_MATERIAL  : begin diffuseTextureId:=1; wireFrame:=1; end;
+      SKYBOX_BACK_MATERIAL  : begin diffuseTextureId:=2; wireFrame:=1; end;
+      SKYBOX_RIGHT_MATERIAL : begin diffuseTextureId:=3; wireFrame:=1; end;
+      SKYBOX_TOP_MATERIAL   : begin diffuseTextureId:=4; wireFrame:=1; end;
+      SKYBOX_BOTTOM_MATERIAL: begin diffuseTextureId:=5; wireFrame:=1; end;
 
       // Fractals
       MANDELBROT_MATERIAL: begin r:=127/255; g:=127/255; b:=127/255; diffuseTextureId:=TEXTURE_MANDELBROT; end;
@@ -538,7 +580,9 @@ begin
       LIGHT_MATERIAL_008: begin innerIllumination:=1; end;
       LIGHT_MATERIAL_009: begin innerIllumination:=1; end;
       LIGHT_MATERIAL_010: begin innerIllumination:=1; end;
-      DEFAULT_LIGHT_MATERIAL: begin r:=1; g:=1; b:=1; innerIllumination:=1; end;
+      DEFAULT_LIGHT_MATERIAL: begin r:=1; g:=1; b:=1; innerIllumination:=2; end;
+
+      SKYBOX_SPHERE_MATERIAL: begin wireFrame:=2; end;
     end;
 
     RayTracer_SetMaterial(
@@ -548,20 +592,20 @@ begin
       reflection,
       refraction,
       integer(procedural),
-      integer(wireFrame), 1,
-      transparency,
+      wireFrame, 1,
+      transparency, opacity,
       diffuseTextureId,normalTextureId,bumpTextureId,specularTextureId,
       reflectionTextureId,transparencyTextureId,
       specular.x, specular.y, specular.z,
       innerIllumination, illuminationDiffusion, illuminationPropagation,
       integer(fastTransparency) );
   end;
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.Initialize;
 begin
-  maxPathTracingIterations := 10;
+  FMaxPathTracingIterations := 1;
   F3DBitmap := TBitmap.Create;
   F3DBitmap.Width  := img3DView.Width;
   F3DBitmap.Height := img3DView.Height;
@@ -577,10 +621,15 @@ begin
 
   if( not FKernelInitialized ) then
   begin
+      RayTracer_SetDraftMode(0);
+
       updateScene;
-      RayTracer_InitializeKernel( false, cbPlatforms.ItemIndex, cbDevices.ItemIndex );
+  {$ifdef CUDA}
+      RayTracer_InitializeKernel(false,0,0);
+  {$else}
+      RayTracer_InitializeKernel(false,FOCLPlatform,FOCLDevice);
+  {$endif}
       FKernelInitialized := true;
-      pnlSystem.Enabled := false;
   end;
   RayTracer_ResetKernel();
 
@@ -590,19 +639,19 @@ begin
   // 3D View
   viewPos.x := 1; viewPos.y := 0; viewPos.z := -10000;
   viewDir.x := 1; viewDir.y := 0; viewDir.z := -5000;
-  viewAngles.x := 0; viewAngles.y := 0; viewAngles.z := 0;
+  viewAngles.x := 0.5; viewAngles.y := 0.5; viewAngles.z := 0;
 
-  lampPos.x :=  10000;
-  lampPos.y :=  20000;
-  lampPos.z := -10000;
-  lampSize  :=  500;
+  lampPos.x := 5000;
+  lampPos.y := 5000;
+  lampPos.z := -5000;
+  lampSize  := 10;
 
   mouseDown := false;
   previousMouseX := 0;
   previousMouseY := 0;
 
-  pathTracingIteration := 0;
-  postProcessingParam := 10000;
+  FPathTracingIteration := 0;
+  postProcessingParam := 1000;
 
   initializeMaterials;
   updateMaterials;
@@ -616,7 +665,6 @@ procedure TmainForm.RenderScene;
 begin
   if( SceneInitialized ) then
   begin
-    pbProcessing.Position := pathTracingIteration;
     RayTracer_SetPostProcessingInfo(
       cbPostProcessing.itemIndex,
       postProcessingParam,
@@ -627,6 +675,9 @@ begin
       viewPos.x, viewPos.y, viewPos.z,
       viewDir.x, viewDir.y, viewDir.z,
       viewAngles.x, viewAngles.y, viewAngles.z );
+
+    updateScene;
+
     RayTracer_RunKernel(0,F3DBitmap.ScanLine[img3DView.Height-1]);
 
     img3DView.Picture.Assign(F3DBitmap);
@@ -636,7 +687,7 @@ end;
 
 procedure TmainForm.rgMiscClick(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.rgMouseControlsClick(Sender: TObject);
@@ -646,6 +697,63 @@ begin
     FCurrentMaterialId := DEFAULT_LIGHT_MATERIAL;
     updateMaterialControls;
   end;
+end;
+
+procedure TmainForm.meInnerIlluminationExit(Sender: TObject);
+begin
+  sbInnerIllumination.Position := min(max(0,trunc(StrToFloat(meInnerIllumination.text)*100)),200);
+  updateMaterial;
+end;
+
+procedure TmainForm.meNoiseExit(Sender: TObject);
+begin
+  sbNoise.Position := min(max(0,trunc(StrToFloat(meNoise.text)*100)),100);
+  updateMaterial;
+end;
+
+procedure TmainForm.meOpacityExit(Sender: TObject);
+begin
+  sbOpacity.Position := min(max(0,trunc(StrToInt(meOpacity.text))),1000);
+  updateMaterial;
+end;
+
+procedure TmainForm.meReflectionExit(Sender: TObject);
+begin
+  sbReflection.Position := min(max(0,trunc(StrToFloat(meReflection.text)*100)),100);
+  updateMaterial;
+end;
+
+procedure TmainForm.meRefractionExit(Sender: TObject);
+begin
+  sbRefraction.Position := min(max(0,trunc(StrToFloat(meRefraction.text)*100)),500);
+  updateMaterial;
+end;
+
+procedure TmainForm.meSpecCoefExit(Sender: TObject);
+begin
+  sbSpecValue.Position := min(max(0,trunc(StrToFloat(meSpecValue.text)*100)),100);
+  updateMaterial;
+end;
+
+procedure TmainForm.meSpecValueExit(Sender: TObject);
+begin
+  sbSpecValue.Position := min(max(0,trunc(StrToFloat(meSpecValue.text)*100)),200);
+  updateMaterial;
+end;
+
+procedure TmainForm.meTransparencyExit(Sender: TObject);
+begin
+  sbTransparency.Position := min(max(0,trunc(StrToFloat(meTransparency.text)*100)),100);;
+  updateMaterial;
+end;
+
+procedure TmainForm.miAboutClick(Sender: TObject);
+var
+  frmAbout: TFrmAbout;
+begin
+  frmAbout:=TfrmAbout.Create(self);
+  frmAbout.ShowModal;
+  frmAbout.Free;
 end;
 
 procedure TmainForm.miBumpTextureClick(Sender: TObject);
@@ -674,6 +782,7 @@ end;
 
 procedure TmainForm.miSaveAsClick(Sender: TObject);
 begin
+  sdSaveFile.Filter := 'SoL-R File|*.irt';
   if sdSaveFile.Execute then
   begin
     RayTracer_SaveToFile( AnsiString(sdSaveFile.FileName) );
@@ -690,12 +799,21 @@ begin
     RayTracer_SaveToFile(currentModel.Filename);
 end;
 
-procedure TmainForm.miScreenshotClick(Sender: TObject);
+procedure TmainForm.miHiResScreenshotClick(Sender: TObject);
 begin
-  sdSaveFile.Filter:='JPG file|*.jpg';
+  sdSaveFile.Filter:='JPEG|*.jpg';
   if sdSaveFile.Execute then
   begin
     RayTracer_GenerateScreenshot(AnsiString(sdSaveFile.FileName),1);
+  end;
+end;
+
+procedure TmainForm.miLowResScreenshotClick(Sender: TObject);
+begin
+  sdSaveFile.Filter := 'Bitmap|*.bmp|JPEG|*.jpg';
+  if sdSaveFile.Execute then
+  begin
+    img3DView.Picture.SaveToFile(sdSaveFile.FileName);
   end;
 end;
 
@@ -709,37 +827,35 @@ begin
 end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
-{$ifndef CUDA}
 var
-  platforms: integer;
-  devices  : integer;
-  value    : PAnsiChar;
-  p,d      : Integer;
-{$endif CUDA}
+  i: integer;
+  str, key, value, fileExtension: string;
+  position: integer;
+{$ifndef CUDA}
+  fOCLSettings: TfrmOpenCLSettings;
+{$endif}
 begin
 {$ifndef CUDA}
-  RayTracer_PopulateOpenCLInformation;
-  cbPlatforms.Items.Clear;
-  value := AllocMem(100);
-  platforms := RayTracer_GetOpenCLPlaformCount;
-  for p := 0 to platforms-1 do
+  FOCLPlatform := 0;
+  FOCLDevice := 0;
+  fOCLSettings := TfrmOpenCLSettings.Create(self);
+  if fOCLSettings.ShowModal=mrOk then
   begin
-    RayTracer_GetOpenCLPlatformDescription(p,value,100);
-    cbPlatforms.Items.add(string(value));
-    memLogs.lines.Add(IntToStr(p) + ': ' + string(value));
-    devices := RayTracer_GetOpenCLDeviceCount(p);
-    for d := 0 to devices-1 do
-    begin
-      RayTracer_GetOpenCLDeviceDescription(p,d,value,100);
-      memLogs.lines.Add('-' + IntToStr(d) + ': ' + string(value));
-    end;
+    FOCLPlatform := fOCLSettings.cbPlatforms.ItemIndex;
+    FOCLDevice := fOCLSettings.cbDevices.ItemIndex;
   end;
-  FreeMem(value);
-  cbPlatforms.ItemIndex := 0;
-  cbDevices.ItemIndex := 0;
+  fOCLSettings.Free;
 {$else}
-  pnlSystem.Visible := false;
+  btnRecompileKernels.Visible := false;
 {$endif CUDA}
+
+  FKernelInitialized := false;
+  ApplicationFolder := ExtractFileDir(Application.ExeName) + '\';
+  pgParameters.Enabled := false;
+  pnlCenter.Enabled := false;
+  tsMaterial.Enabled := false;
+  SceneInitialized := false;
+  currentModel.modelType := mtNone;
 
    imgDiffuseTexture.Picture.Assign(imgNone.Picture);
    imgBumpTexture.Picture.Assign(imgNone.Picture);
@@ -747,21 +863,46 @@ begin
    imgSpecularTexture.Picture.Assign(imgNone.Picture);
    imgReflectionTexture.Picture.Assign(imgNone.Picture);
    imgTransparencyTexture.Picture.Assign(imgNone.Picture);
+
+  for i := 0 to ParamCount do
+  begin
+    str := ParamStr(i);
+    position := AnsiPos('=',str);
+    if position<>0 then
+    begin
+      key  := AnsiLeftStr(str,position-1);
+      value:= AnsiMidStr(str,position+1,str.Length);
+      if key='-objFile' then
+      begin
+        fileExtension := ExtractFileExt(value);
+        currentModel.filename  := AnsiString(value);
+        if fileExtension = '.pdb' then
+        begin
+          currentModel.modelType := mtPDB;
+        end
+        else
+        begin
+          if fileExtension = '.obj' then
+          begin
+            currentModel.modelType := mtOBJ;
+          end
+          else
+          if fileExtension = '.irt' then
+          begin
+            currentModel.modelType := mtIRT;
+          end;
+        end;
+        updateWorld;
+        Application.ProcessMessages;
+      end;
+    end;
+  end;
+
 end;
 
 procedure TmainForm.FormDestroy(Sender: TObject);
 begin
  RayTracer_FinalizeKernel;
-end;
-
-procedure TmainForm.FormShow(Sender: TObject);
-begin
-  FKernelInitialized := false;
-  ApplicationFolder := ExtractFileDir(Application.ExeName) + '\';
-  pgParameters.Enabled := false;
-  tsMaterial.Enabled := false;
-  SceneInitialized := false;
-  currentModel.modelType := mtNone;
 end;
 
 procedure TmainForm.tbReflectionChange(Sender: TObject);
@@ -776,26 +917,25 @@ begin
   if( not FControlUpdate ) and ( FCurrentMaterialId<>MATERIAL_NONE ) then
   begin
     if( cbFastTransparency.Checked ) then fastTransparency := 1 else fastTransparency := 0;
-    pathTracingIteration := 0;
+    FPathTracingIteration := 0;
     FCurrentMaterial.color.x := GetRValue(shMaterialColor.Brush.Color)/255;
     FCurrentMaterial.color.y := GetGValue(shMaterialColor.Brush.Color)/255;
     FCurrentMaterial.color.z := GetBValue(shMaterialColor.Brush.Color)/255;
     FCurrentMaterial.noise   := sbNoise.Position/100;
+    FCurrentMaterial.opacity := sbOpacity.Position;
     FCurrentMaterial.reflection := sbReflection.Position/100;
-    FCurrentMaterial.refraction := 1+sbRefraction.Position/100;
+    FCurrentMaterial.refraction := sbRefraction.Position/100;
     FCurrentMaterial.procedural := integer(cbProcedural.checked);
     FCurrentMaterial.wireframe  := integer(not cbCastShadows.Checked);
     FCurrentMaterial.wireframeDepth := 0;
     FCurrentMaterial.transparency:= sbTransparency.Position/100;
     FCurrentMaterial.specular.x:=sbSpecValue.Position/100;
     FCurrentMaterial.specular.y:=sbSpecPower.Position;
-    FCurrentMaterial.specular.z:=sbSpecCoef.Position/100;
     FCurrentMaterial.innerIllumination:=sbInnerIllumination.Position/100;
-    FCurrentMaterial.illuminationDiffusion:=sbIlluminationDiffusion.Position*5000;
-    FCurrentMaterial.illuminationPropagation:=sbIlluminationPropagation.Position*5000;
+    FCurrentMaterial.illuminationDiffusion:=sbIlluminationDiffusion.Position*500;
+    FCurrentMaterial.illuminationPropagation:=sbIlluminationPropagation.Position*500;
     FCurrentMaterial.fastTransparency:=fastTransparency;
 
-    memLogs.Lines.Add('Diffuse: ' + inttostr(FCurrentMaterial.diffuseTextureId));
     RayTracer_SetMaterial(
       FCurrentMaterialId,
       FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
@@ -805,6 +945,7 @@ begin
       FCurrentMaterial.procedural,
       FCurrentMaterial.wireframe, FCurrentMaterial.wireframeDepth,
       FCurrentMaterial.transparency,
+      FCurrentMaterial.opacity,
       FCurrentMaterial.diffuseTextureId,
       FCurrentMaterial.normalTextureId,
       FCurrentMaterial.bumpTextureId,
@@ -816,7 +957,7 @@ begin
       FCurrentMaterial.fastTransparency );
 
     setMaterialControls;
-    updateScene;
+    RenderScene;
   end;
 end;
 
@@ -837,10 +978,10 @@ begin
       GetRValue( shBackgroundColor.Brush.Color)/255,
       GetGValue( shBackgroundColor.Brush.Color)/255,
       GetBValue( shBackgroundColor.Brush.Color)/255,
-      0.1,
+      sbAmbientLightIntensity.Position/20,
       integer(cbBoundingBoxes.checked),
-      pathTracingIteration,
-      maxPathTracingIterations,
+      FPathTracingIteration,
+      FMaxPathTracingIterations,
       integer(ot_Delphi),
       random(1000),
       0,
@@ -848,7 +989,6 @@ begin
       integer(cbDoubleSidedTriangles.Checked),
       integer(cbGradientBackGround.Checked),
       integer(cbAdvancedRenderingFeatures.Checked));
-    RenderScene;
   end;
 end;
 
@@ -902,6 +1042,16 @@ begin
   updateMaterial;
 end;
 
+procedure TmainForm.sbAmbientLightIntensityChange(Sender: TObject);
+begin
+   RenderScene;
+end;
+
+procedure TmainForm.sbCameraClick(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex:=0;
+end;
+
 procedure TmainForm.sbDefaultAtomSizeChange(Sender: TObject);
 begin
   updateWorld;
@@ -917,7 +1067,17 @@ begin
   updateMaterial;
 end;
 
+procedure TmainForm.sbMaterialClick(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex:=1;
+end;
+
 procedure TmainForm.sbNoiseChange(Sender: TObject);
+begin
+  updateMaterial;
+end;
+
+procedure TmainForm.sbOpacityChange(Sender: TObject);
 begin
   updateMaterial;
 end;
@@ -939,53 +1099,94 @@ end;
 
 procedure TmainForm.cbShadowsClick(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.sbShadowIntensityChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.sbRayInterationsChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.sbViewDistanceChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.cb3DVisionChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.sbWith3DVisionChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.cbBoundingBoxesClick(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.cbContinuousRenderingClick(Sender: TObject);
 begin
-  if( cbContinuousRendering.Checked ) then
+  FPathTracingIteration := 0;
+  if( timer.Enabled ) then
   begin
-      maxPathTracingIterations := pbProcessing.Max;
-      timer.Enabled := true;
-    end
-    else
-    maxPathTracingIterations := 1;
+    timer.Enabled := false;
+    FMaxPathTracingIterations := 1;
+    pbProcessing.Position := FPathTracingIteration;
+    updateScene;
+  end
+  else
+  begin
+    FMaxPathTracingIterations := pbProcessing.Max;
+    timer.Enabled := true;
+  end;
 end;
 
 procedure TmainForm.cbDoubleSidedTrianglesClick(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
+end;
+
+procedure TmainForm.img3DViewMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  center: T3DPoint;
+begin
+  timer.Enabled := false;
+  pbProcessing.Position := 0;
+  mouseDown := true;
+  mouseButton := Button;
+  previousMouseY := (Y-img3DView.Height div 2);
+
+  if(cbDraftMode.Checked) then
+    RayTracer_SetDraftMode(1);
+
+  if( FCurrentPrimitive<>PRIMITIVE_NONE ) and ( Button = mbLeft ) then
+  begin
+    case rgMouseControls.ItemIndex of
+      1: // Molecule
+      begin
+        FCurrentMaterialId := RayTracer_GetPrimitiveMaterial(FCurrentPrimitive);
+        updateMaterialControls;
+        FPathTracingIteration := 0;
+      end;
+      3: // Post processing effetcs
+      begin
+        RayTracer_GetPrimitiveCenter(FCurrentPrimitive, center.x, center.y, center.z);
+        postProcessingParam := center.z-viewPos.z;
+        FPathTracingIteration := 0;
+      end;
+    end;
+  end
+  else
+    tsMaterial.Enabled := false;
 end;
 
 procedure TmainForm.img3DViewMouseMove(Sender: TObject; Shift: TShiftState;
@@ -1001,14 +1202,13 @@ begin
     lblPrimitiveID.Caption := 'Primitive ID: ' + IntToStr(FCurrentPrimitive);
   end;
 
-  if(cbDraftMode.Checked) then RayTracer_SetDraftMode(1);
   mx := (X-img3DView.Width div 2);
   my := (Y-img3DView.Height div 2);
 
   try
     if( mouseDown ) then
     begin
-      pathTracingIteration := 0;
+      FPathTracingIteration := 0;
       case mouseButton of
         mbLeft:
         begin
@@ -1018,6 +1218,14 @@ begin
               if( ssShift in Shift ) then
               begin
                 viewPos.z := viewPos.z - 20*( my - previousMouseY );
+              end
+              else
+              if( ssAlt in Shift ) then
+              begin
+                viewPos.x := viewPos.x + 20*( mx - previousMouseX );
+                viewPos.y := viewPos.y + 20*( my - previousMouseY );
+                viewDir.x := viewDir.x + 20*( mx - previousMouseX );
+                viewDir.y := viewDir.y + 20*( my - previousMouseY );
               end
               else
               begin
@@ -1115,6 +1323,7 @@ begin
       FCurrentMaterial.procedural,
       FCurrentMaterial.wireframe, FCurrentMaterial.wireframeDepth,
       FCurrentMaterial.transparency,
+      FCurrentMaterial.opacity,
       FCurrentMaterial.diffuseTextureId,
       FCurrentMaterial.normalTextureId,
       FCurrentMaterial.bumpTextureId,
@@ -1128,40 +1337,11 @@ begin
 
     tsMaterial.Enabled := true;
     pgParameters.ActivePage := tsMaterial;
+    gbIllumination.Visible := (FCurrentMaterial.innerIllumination<>0);
+    gbBasicParameters.Visible := (FCurrentMaterial.innerIllumination=0);
+    gbTextureIds.Visible := (FCurrentMaterial.innerIllumination=0);
+    gbSpecularity.Visible := (FCurrentMaterial.innerIllumination=0);
   end;
-end;
-
-procedure TmainForm.img3DViewMouseown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  center: T3DPoint;
-begin
-  mouseDown := true;
-  mouseButton := Button;
-  previousMouseY := (Y-img3DView.Height div 2);
-
-  if( FCurrentPrimitive<>PRIMITIVE_NONE ) and ( Button = mbLeft ) then
-  begin
-    case rgMouseControls.ItemIndex of
-      1: // Molecule
-      begin
-        FCurrentMaterialId := RayTracer_GetPrimitiveMaterial(FCurrentPrimitive);
-        updateMaterialControls;
-        pathTracingIteration := 0;
-      end;
-      3: // Post processing effetcs
-      begin
-        RayTracer_GetPrimitiveCenter(FCurrentPrimitive, center.x, center.y, center.z);
-        postProcessingParam := center.z-viewPos.z;
-        pathTracingIteration := 0;
-      end;
-    end;
-  end
-  else
-  begin
-    tsMaterial.Enabled := false;
-  end;
-
 end;
 
 procedure TmainForm.img3DViewMouseUp(Sender: TObject; Button: TMouseButton;
@@ -1173,6 +1353,7 @@ begin
     RenderScene;
   end;
   mouseDown := false;
+  timer.Enabled := cbContinuousRendering.Checked;
 end;
 
 procedure TmainForm.imgBumpTextureClick(Sender: TObject);
@@ -1207,19 +1388,12 @@ end;
 
 procedure TmainForm.TimerTimer(Sender: TObject);
 begin
-  if( pathTracingIteration < maxPathTracingIterations ) then
+  if( FPathTracingIteration<FMaxPathTracingIterations ) then
   begin
-    inc( pathTracingIteration );
-    lblPathTracingIterations.Caption := '(' + IntToStr(pathTracingIteration) +
-    '/' + IntToStr(maxPathTracingIterations) + ')';
-    UpdateScene;
+    inc( FPathTracingIteration );
+    pbProcessing.Position := FPathTracingIteration;
+    RenderScene;
   end
-  else
-  begin
-    pathTracingIteration := 0;
-    timer.Enabled := false;
-    cbContinuousRendering.Checked := false;
-  end;
 end;
 
 procedure TmainForm.updateWorld;
@@ -1231,6 +1405,7 @@ var
 begin
   Timer.Enabled := false;
   cbContinuousRendering.Checked := false;
+  pbProcessing.Position := 0;
   SceneInitialized := false;
   Screen.Cursor := crHourGlass;
   pgParameters.ActivePage := tsControls;
@@ -1269,41 +1444,41 @@ begin
     DEFAULT_LIGHT_MATERIAL);
 
   // Create Scene
-  boxSize:=50000;
+  boxSize:=sbViewDistance.Position*500*0.8;
   case cbScene.ItemIndex of
     0: ;// nothing
     1: // Ground
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
     end;
     2: // Skymap
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
-      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
     end;
     3: // Skymap and Ground
     begin
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
       primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_SPHERE_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
 
       primitiveId := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
-      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, CORNELLBOX_GROUND_MATERIAL);
+      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
       RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
     end;
     4: // Cornell Box
@@ -1386,11 +1561,36 @@ begin
   memLogs.Lines.Add( 'Current model: ' + String(currentModel.Filename));
 
   pgParameters.Enabled := true;
+  pnlCenter.Enabled := true;
   SceneInitialized := true;
 
   lblElements.Caption := IntToStr(nbPrimitives) + ' element(s)';
   RenderScene;
   Screen.Cursor := crDefault;
+end;
+
+procedure TmainForm.bgControlsItems0Click(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex := 0;
+  rgMouseControlsClick(Sender);
+end;
+
+procedure TmainForm.bgControlsItems1Click(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex := 1;
+  rgMouseControlsClick(Sender);
+end;
+
+procedure TmainForm.bgControlsItems2Click(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex := 2;
+  rgMouseControlsClick(Sender);
+end;
+
+procedure TmainForm.bgControlsItems3Click(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex := 3;
+  rgMouseControlsClick(Sender);
 end;
 
 procedure TmainForm.btnAddTextureClick(Sender: TObject);
@@ -1456,6 +1656,13 @@ begin
   end;
 end;
 
+procedure TmainForm.btnRecompileKernelsClick(Sender: TObject);
+begin
+{$ifndef CUDA}
+  RayTracer_RecompileKernels('E:/svn/GPGPU/CUDA/RaytracingEngine/trunk/OpenCL/RayTracer.cl');
+{$endif CUDA}
+end;
+
 procedure TmainForm.cbFastTransparencyClick(Sender: TObject);
 begin
   updateMaterial;
@@ -1468,7 +1675,7 @@ end;
 
 procedure TmainForm.cbFogEffectClick(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.cbGeometryTypeChange(Sender: TObject);
@@ -1478,12 +1685,12 @@ end;
 
 procedure TmainForm.cbGraphicsLevelChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.cbIsometric3DClick(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.cbSticksClick(Sender: TObject);
@@ -1538,7 +1745,6 @@ begin
   if index<n then
   begin
     FCurrentSelectedTextureId := index;
-    memLogs.Lines.Add('CurrentSelectedTextureId='+inttostr(FCurrentSelectedTextureId));
   end;
 end;
 
@@ -1563,7 +1769,7 @@ begin
   if( cdColor.Execute ) then
   begin
     shBackgroundColor.Brush.Color := cdColor.Color;
-    updateScene;
+    RenderScene;
   end;
 end;
 
@@ -1586,21 +1792,31 @@ begin
   updateMaterial;
 end;
 
+procedure TmainForm.SpeedButton1Click(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex:=2;
+end;
+
+procedure TmainForm.SpeedButton2Click(Sender: TObject);
+begin
+  rgMouseControls.ItemIndex:=3;
+end;
+
 procedure TmainForm.setMaterialControls;
 begin
   FControlUpdate := true;
 
   sbSpecValue.Position := trunc(FCurrentMaterial.specular.x*100);
   sbSpecPower.Position := trunc(FCurrentMaterial.specular.y);
-  sbSpecCoef.Position  := trunc(FCurrentMaterial.specular.z*100);
   sbInnerIllumination.Position  := trunc(FCurrentMaterial.innerIllumination*100);
-  sbIlluminationDiffusion.Position := trunc(FCurrentMaterial.illuminationDiffusion/5000);
-  sbIlluminationPropagation.Position := trunc(FCurrentMaterial.illuminationPropagation/5000);
+  sbIlluminationDiffusion.Position := trunc(FCurrentMaterial.illuminationDiffusion/500);
+  sbIlluminationPropagation.Position := trunc(FCurrentMaterial.illuminationPropagation/500);
   cbProcedural.Checked := ( FCurrentMaterial.procedural = 1 );
   sbReflection.Position := trunc(FCurrentMaterial.reflection*100);
   sbTransparency.Position := trunc(FCurrentMaterial.transparency*100);
-  sbRefraction.Position := trunc((FCurrentMaterial.refraction-1)*100);
+  sbRefraction.Position := trunc(FCurrentMaterial.refraction*100);
   sbNoise.Position := trunc(FCurrentMaterial.noise*100);
+  sbOpacity.Position := trunc(FCurrentMaterial.opacity);
 
   loadTextureIntoControl(FCurrentMaterial.diffuseTextureId,imgDiffuseTexture);
   loadTextureIntoControl(FCurrentMaterial.bumpTextureId,imgBumpTexture);
@@ -1612,10 +1828,16 @@ begin
   cbCastShadows.Checked := (FCurrentMaterial.wireframe=0);
 
   // Labels
-  lblReflectionValue.Caption := FloatToStrF(FCurrentMaterial.reflection,ffNumber,1,2);
-  lblTransparencyValue.Caption := FloatToStrF(FCurrentMaterial.transparency,ffNumber,1,2);
-  lblRefractionValue.Caption := FloatToStrF(FCurrentMaterial.refraction,ffNumber,1,2);
-  lblNoiseValue.Caption := FloatToStrF(FCurrentMaterial.noise,ffNumber,1,2);
+  meReflection.Text := FloatToStrF(FCurrentMaterial.reflection,ffNumber,1,2);
+  meTransparency.Text := FloatToStrF(FCurrentMaterial.transparency,ffNumber,1,2);
+  meRefraction.Text := FloatToStrF(FCurrentMaterial.refraction,ffNumber,1,2);
+  meNoise.Text := FloatToStrF(FCurrentMaterial.noise,ffNumber,1,2);
+  meOpacity.Text := IntToStr(trunc(FCurrentMaterial.opacity));
+
+  meSpecValue.Text := FloatToStrF(FCurrentMaterial.specular.x,ffNumber,1,2);
+  meSpecPower.Text := FloatToStrF(FCurrentMaterial.specular.y,ffNumber,1,2);
+
+  meInnerIllumination.Text := FloatToStrF(FCurrentMaterial.innerIllumination,ffNumber,1,2);
 
   shMaterialColor.Brush.Color := RGB(
     trunc(FCurrentMaterial.color.x*255),
@@ -1629,36 +1851,12 @@ end;
     
 procedure TmainForm.sbPPIntensityChange(Sender: TObject);
 begin
-  updateScene;
-end;
-
-procedure TmainForm.cbPlatformsChange(Sender: TObject);
-{$ifndef CUDA}
-var
-  devices  : integer;
-  value    : PAnsiChar;
-  p,d      : Integer;
-{$endif CUDA}
-begin
-{$ifndef CUDA}
-  p := cbPlatforms.ItemIndex;
-  cbDevices.Items.Clear;
-  value := AllocMem(100);
-  RayTracer_GetOpenCLPlatformDescription(p,value,100);
-  devices := RayTracer_GetOpenCLDeviceCount(p);
-  for d := 0 to devices-1 do
-  begin
-    RayTracer_GetOpenCLDeviceDescription(p,d,value,100);
-    cbDevices.Items.Add(string(value));
-  end;
-  FreeMem(value);
-  cbDevices.ItemIndex := 0;
-{$endif CUDA}
+  RenderScene;
 end;
 
 procedure TmainForm.cbPostProcessingChange(Sender: TObject);
 begin
-  updateScene;
+  RenderScene;
 end;
 
 procedure TmainForm.pnlCenterMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -1690,7 +1888,6 @@ begin
 
     RayTracer_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
     image.Picture.Bitmap.Assign(FTexturePreview);
-    memLogs.Lines.Add('Texture size ('+IntToStr(width)+'x'+IntToStr(height)+'x'+IntToStr(depth) + ')');
   end;
   image.Refresh;
 end;

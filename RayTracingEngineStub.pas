@@ -147,6 +147,7 @@ Type
     reflection : double;
     refraction : double;
     transparency : double;
+    opacity: double;
     procedural : integer;
     wireframe : integer;
     wireframeDepth : integer;
@@ -172,6 +173,9 @@ Function RayTracer_GetOpenCLDeviceCount(
 
 Function RayTracer_GetOpenCLDeviceDescription(
   platform, device: integer; value: PAnsiChar; valueLength: integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
+
+Function RayTracer_RecompileKernels(
+  filename: PAnsiChar) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 {$endif CUDA}
 
 Function RayTracer_SetSceneInfo(
@@ -276,7 +280,7 @@ Function RayTracer_SetMaterial(
    color_r, color_g, color_b, noise, reflection, refraction : Double;
    procedural : Integer;
    wireframe : Integer; wireframeDepth: Integer;
-   transparency : Double;
+   transparency : Double; opacity: Double;
    diffuseTextureId, normalTextureId, bumpTextureId, specularTextureId, reflectionTextureId, transparencyTrextureId : Integer;
    specValue, specPower, specCoef : Double;
    innerIllumination, illuminationDiffusion, illuminationPropagation : Double;
@@ -288,7 +292,7 @@ Function RayTracer_GetMaterial(
    var noise: double; var reflection: double; var refraction : Double;
    var procedural : integer;
    var wireframe    : Integer; var wireframeDepth: Integer;
-   var transparency : Double;
+   var transparency : Double;  var opacity: Double;
    var diffuseTextureId : Integer; var normalTextureId : Integer; var bumpTextureId : Integer;
    var specularTextureId : Integer; var reflectionTextureId : Integer; var transparencyTrextureId : Integer;
    var specValue: double; var specPower: double; var specCoef: double;

@@ -158,8 +158,8 @@ type
     meSpecValue: TMaskEdit;
     sbCamera: TSpeedButton;
     sbMaterial: TSpeedButton;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
+    sbLight: TSpeedButton;
+    sbPostProcessing: TSpeedButton;
     miLowResScreenshot: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
@@ -259,8 +259,8 @@ type
     procedure bgControlsItems3Click(Sender: TObject);
     procedure sbCameraClick(Sender: TObject);
     procedure sbMaterialClick(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
+    procedure sbLightClick(Sender: TObject);
+    procedure sbPostProcessingClick(Sender: TObject);
     procedure miLowResScreenshotClick(Sender: TObject);
   private
     { Private declarations }
@@ -554,6 +554,9 @@ begin
       SKYBOX_TOP_MATERIAL   : begin diffuseTextureId:=4; wireFrame:=1; end;
       SKYBOX_BOTTOM_MATERIAL: begin diffuseTextureId:=5; wireFrame:=1; end;
 
+      SKYBOX_SPHERE_MATERIAL: begin r:=1; g:=1; b:=1; wireFrame:=2; diffuseTextureId:=6; end;
+      SKYBOX_GROUND_MATERIAL: begin r:=1; g:=1; b:=1; end;
+
       // Fractals
       MANDELBROT_MATERIAL: begin r:=127/255; g:=127/255; b:=127/255; diffuseTextureId:=TEXTURE_MANDELBROT; end;
       JULIA_MATERIAL     : begin r:=154/255; g:=94/255;  b:=64/255;  diffuseTextureId:=TEXTURE_JULIA; end;
@@ -581,8 +584,6 @@ begin
       LIGHT_MATERIAL_009: begin innerIllumination:=1; end;
       LIGHT_MATERIAL_010: begin innerIllumination:=1; end;
       DEFAULT_LIGHT_MATERIAL: begin r:=1; g:=1; b:=1; innerIllumination:=2; end;
-
-      SKYBOX_SPHERE_MATERIAL: begin wireFrame:=2; end;
     end;
 
     RayTracer_SetMaterial(
@@ -988,7 +989,8 @@ begin
       rgMisc.ItemIndex,
       integer(cbDoubleSidedTriangles.Checked),
       integer(cbGradientBackGround.Checked),
-      integer(cbAdvancedRenderingFeatures.Checked));
+      integer(cbAdvancedRenderingFeatures.Checked),
+      sbViewDistance.Position*450,SKYBOX_SPHERE_MATERIAL);
   end;
 end;
 
@@ -1049,6 +1051,7 @@ end;
 
 procedure TmainForm.sbCameraClick(Sender: TObject);
 begin
+  Screen.Cursor := crDefault;
   rgMouseControls.ItemIndex:=0;
 end;
 
@@ -1069,6 +1072,7 @@ end;
 
 procedure TmainForm.sbMaterialClick(Sender: TObject);
 begin
+  Screen.Cursor := crHandPoint;
   rgMouseControls.ItemIndex:=1;
 end;
 
@@ -1766,11 +1770,16 @@ end;
 procedure TmainForm.shBackgroundColorMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
+  FCurrentMaterialId := SKYBOX_SPHERE_MATERIAL;
+  updateMaterialControls;
+  FPathTracingIteration := 0;
+  {
   if( cdColor.Execute ) then
   begin
     shBackgroundColor.Brush.Color := cdColor.Color;
     RenderScene;
   end;
+  }
 end;
 
 procedure TmainForm.shMaterialColorMouseDown(Sender: TObject;
@@ -1792,13 +1801,15 @@ begin
   updateMaterial;
 end;
 
-procedure TmainForm.SpeedButton1Click(Sender: TObject);
+procedure TmainForm.sbLightClick(Sender: TObject);
 begin
+  Screen.Cursor := crCross;
   rgMouseControls.ItemIndex:=2;
 end;
 
-procedure TmainForm.SpeedButton2Click(Sender: TObject);
+procedure TmainForm.sbPostProcessingClick(Sender: TObject);
 begin
+  Screen.Cursor := crVSplit;
   rgMouseControls.ItemIndex:=3;
 end;
 

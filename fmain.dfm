@@ -8306,7 +8306,7 @@ object mainForm: TmainForm
       Transparent = False
       OnClick = sbMaterialClick
     end
-    object SpeedButton1: TSpeedButton
+    object sbLight: TSpeedButton
       Left = 268
       Top = 9
       Width = 48
@@ -8413,9 +8413,9 @@ object mainForm: TmainForm
         679B9B9BBDBDBDCECECECECECEBDBDBD9B9B9B67676721212101010100000000
         0000000000000000000000000000000000000000000000000000}
       Transparent = False
-      OnClick = SpeedButton1Click
+      OnClick = sbLightClick
     end
-    object SpeedButton2: TSpeedButton
+    object sbPostProcessing: TSpeedButton
       Left = 322
       Top = 9
       Width = 48
@@ -8522,7 +8522,7 @@ object mainForm: TmainForm
         000000000000000000000000000000000000000000000000001C1C1C89898997
         9797060606505050747474222222000000000000000000000000}
       Transparent = False
-      OnClick = SpeedButton2Click
+      OnClick = sbPostProcessingClick
     end
     object pnlControlButtons: TPanel
       Left = 1

@@ -157,6 +157,7 @@ Type
     specularTextureId : integer;
     reflectionTextureId : integer;
     transparencyTextureId : integer;
+    ambientOcclusionTextureId: integer;
     fastTransparency: integer;
   end;
 
@@ -282,7 +283,7 @@ Function RayTracer_SetMaterial(
    procedural : Integer;
    wireframe : Integer; wireframeDepth: Integer;
    transparency : Double; opacity: Double;
-   diffuseTextureId, normalTextureId, bumpTextureId, specularTextureId, reflectionTextureId, transparencyTrextureId : Integer;
+   diffuseTextureId, normalTextureId, bumpTextureId, specularTextureId, reflectionTextureId, transparencyTrextureId, ambientOcclusionTextureId : Integer;
    specValue, specPower, specCoef : Double;
    innerIllumination, illuminationDiffusion, illuminationPropagation : Double;
    fastTransparency: Integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
@@ -295,7 +296,8 @@ Function RayTracer_GetMaterial(
    var wireframe    : Integer; var wireframeDepth: Integer;
    var transparency : Double;  var opacity: Double;
    var diffuseTextureId : Integer; var normalTextureId : Integer; var bumpTextureId : Integer;
-   var specularTextureId : Integer; var reflectionTextureId : Integer; var transparencyTrextureId : Integer;
+   var specularTextureId : Integer; var reflectionTextureId : Integer;
+   var transparencyTextureId : Integer; var ambientOcclusionTextureId : Integer;
    var specValue: double; var specPower: double; var specCoef: double;
    var innerIllumination: double; var illuminationDiffusion: double; var illuminationPropagation : double;
    var fastTransparency: Integer) : Integer; cdecl; external RAYTRACERMODULE_DLL;
@@ -313,7 +315,9 @@ Function RayTracer_LoadMolecule(
 Function RayTracer_LoadOBJModel(
   filename  : AnsiString;
   materialId: integer;
+  autoScale : integer;
   scale     : double;
+  autoCenter: integer;
   var height: double ) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
 Function RayTracer_CompactBoxes(

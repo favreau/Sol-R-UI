@@ -161,6 +161,9 @@ type
     sbLight: TSpeedButton;
     sbPostProcessing: TSpeedButton;
     miLowResScreenshot: TMenuItem;
+    Label5: TLabel;
+    imgAmbientOcclusionTexture: TImage;
+    miAmbientOcclusionTexture: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -262,6 +265,8 @@ type
     procedure sbLightClick(Sender: TObject);
     procedure sbPostProcessingClick(Sender: TObject);
     procedure miLowResScreenshotClick(Sender: TObject);
+    procedure imgAmbientOcclusionTextureClick(Sender: TObject);
+    procedure miAmbientOcclusionTextureClick(Sender: TObject);
   private
     { Private declarations }
     FPathTracingIteration : integer;
@@ -460,6 +465,7 @@ var
   specularTextureId: integer;
   reflectionTextureId: integer;
   transparencyTextureId: integer;
+  ambientOcclusionTextureId: integer;
   wireFrame: integer;
   opacity: double;
 begin
@@ -473,6 +479,7 @@ begin
 		specularTextureId:= TEXTURE_NONE;
     reflectionTextureId:= TEXTURE_NONE;
     transparencyTextureId:= TEXTURE_NONE;
+    ambientOcclusionTextureId:=TEXTURE_NONE;
 
     // Molecules
     reflection   := 0;
@@ -596,7 +603,7 @@ begin
       wireFrame, 1,
       transparency, opacity,
       diffuseTextureId,normalTextureId,bumpTextureId,specularTextureId,
-      reflectionTextureId,transparencyTextureId,
+      reflectionTextureId,transparencyTextureId,ambientOcclusionTextureId,
       specular.x, specular.y, specular.z,
       innerIllumination, illuminationDiffusion, illuminationPropagation,
       integer(fastTransparency) );
@@ -757,6 +764,12 @@ begin
   frmAbout.Free;
 end;
 
+procedure TmainForm.miAmbientOcclusionTextureClick(Sender: TObject);
+begin
+  FCurrentMaterial.ambientOcclusionTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
+end;
+
 procedure TmainForm.miBumpTextureClick(Sender: TObject);
 begin
   FCurrentMaterial.bumpTextureId := FCurrentSelectedTextureId;
@@ -820,11 +833,8 @@ end;
 
 procedure TmainForm.miTransparentTextureClick(Sender: TObject);
 begin
-  if FCurrentSelectedTextureId<>TEXTURE_NONE then
-  begin
-    FCurrentMaterial.transparencyTextureId := FCurrentSelectedTextureId;
-    updateMaterial;
-  end;
+  FCurrentMaterial.transparencyTextureId := FCurrentSelectedTextureId;
+  updateMaterial;
 end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
@@ -864,6 +874,7 @@ begin
    imgSpecularTexture.Picture.Assign(imgNone.Picture);
    imgReflectionTexture.Picture.Assign(imgNone.Picture);
    imgTransparencyTexture.Picture.Assign(imgNone.Picture);
+   imgAmbientOcclusionTexture.Picture.Assign(imgNone.Picture);
 
   for i := 0 to ParamCount do
   begin
@@ -937,6 +948,7 @@ begin
     FCurrentMaterial.illuminationPropagation:=sbIlluminationPropagation.Position*500;
     FCurrentMaterial.fastTransparency:=fastTransparency;
 
+    memLogs.Lines.Add('Set Transparency id:' + IntToStr(FCurrentMaterial.transparencyTextureId));
     RayTracer_SetMaterial(
       FCurrentMaterialId,
       FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
@@ -953,6 +965,7 @@ begin
       FCurrentMaterial.specularTextureId,
       FCurrentMaterial.reflectionTextureId,
       FCurrentMaterial.transparencyTextureId,
+      FCurrentMaterial.ambientOcclusionTextureId,
       FCurrentMaterial.specular.x,FCurrentMaterial.specular.y,FCurrentMaterial.specular.z,
       FCurrentMaterial.innerIllumination,FCurrentMaterial.illuminationDiffusion,FCurrentMaterial.illuminationPropagation,
       FCurrentMaterial.fastTransparency );
@@ -1334,9 +1347,12 @@ begin
       FCurrentMaterial.specularTextureId,
       FCurrentMaterial.reflectionTextureId,
       FCurrentMaterial.transparencyTextureId,
+      FCurrentMaterial.ambientOcclusionTextureId,
       FCurrentMaterial.specular.x, FCurrentMaterial.specular.y, FCurrentMaterial.specular.z,
       FCurrentMaterial.innerIllumination, FCurrentMaterial.illuminationDiffusion, FCurrentMaterial.illuminationPropagation,
       FCurrentMaterial.FastTransparency );
+
+    memLogs.Lines.Add('Transparency id:' + intToStr(FCurrentMaterial.transparencyTextureId));
     setMaterialControls;
 
     tsMaterial.Enabled := true;
@@ -1358,6 +1374,11 @@ begin
   end;
   mouseDown := false;
   timer.Enabled := cbContinuousRendering.Checked;
+end;
+
+procedure TmainForm.imgAmbientOcclusionTextureClick(Sender: TObject);
+begin
+  activateTextureTab(sender);
 end;
 
 procedure TmainForm.imgBumpTextureClick(Sender: TObject);
@@ -1430,11 +1451,10 @@ begin
         cbRepresentation.ItemIndex,
         50);
     mtOBJ:
-      RayTracer_LoadOBJModel( currentModel.Filename, 0, 5000, groundHeight);
+      RayTracer_LoadOBJModel(currentModel.Filename,0,1,5000,1,groundHeight);
     mtIRT:
-      RayTracer_LoadFromFile( currentModel.Filename, 5000 );
+      RayTracer_LoadFromFile(currentModel.Filename,5000 );
   end;
-
   updateTextureControls;
 
   // Light
@@ -1835,6 +1855,7 @@ begin
   loadTextureIntoControl(FCurrentMaterial.specularTextureId,imgSpecularTexture);
   loadTextureIntoControl(FCurrentMaterial.reflectionTextureId,imgReflectionTexture);
   loadTextureIntoControl(FCurrentMaterial.transparencyTextureId,imgTransparencyTexture);
+  loadTextureIntoControl(FCurrentMaterial.ambientOcclusionTextureId,imgAmbientOcclusionTexture);
 
   cbCastShadows.Checked := (FCurrentMaterial.wireframe=0);
 

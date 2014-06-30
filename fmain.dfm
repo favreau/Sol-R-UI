@@ -5,7 +5,7 @@ object mainForm: TmainForm
   BorderStyle = bsSingle
   Caption = 'SoL-R Editor (Beta Demo)'
   ClientHeight = 713
-  ClientWidth = 762
+  ClientWidth = 797
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -8025,7 +8025,7 @@ object mainForm: TmainForm
   PixelsPerInch = 96
   TextHeight = 13
   object pnlCenter: TPanel
-    Left = 239
+    Left = 274
     Top = 0
     Width = 523
     Height = 713
@@ -8034,6 +8034,7 @@ object mainForm: TmainForm
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseMove = pnlCenterMouseMove
+    ExplicitLeft = 239
     object img3DView: TImage
       Left = 6
       Top = 63
@@ -8586,27 +8587,30 @@ object mainForm: TmainForm
   object pnlPageControls: TPanel
     Left = 0
     Top = 0
-    Width = 239
+    Width = 274
     Height = 713
     Align = alClient
     TabOrder = 1
+    ExplicitWidth = 239
     object pgParameters: TPageControl
       Left = 1
       Top = 1
-      Width = 237
+      Width = 272
       Height = 711
-      ActivePage = tsControls
+      ActivePage = tsMaterial
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
       TabOrder = 0
+      ExplicitWidth = 237
       object tsControls: TTabSheet
         Caption = 'Controls'
+        ExplicitWidth = 229
         object rgMouseControls: TRadioGroup
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 223
+          Width = 258
           Height = 121
           Align = alTop
           Caption = 'Mouse controls'
@@ -8618,16 +8622,18 @@ object mainForm: TmainForm
             'Post processing effects')
           TabOrder = 0
           OnClick = rgMouseControlsClick
+          ExplicitWidth = 223
         end
         object gbPDB: TGroupBox
           Left = 0
           Top = 179
-          Width = 229
+          Width = 264
           Height = 171
           Align = alTop
           Caption = 'Molecule Representation'
           TabOrder = 2
           Visible = False
+          ExplicitWidth = 229
           object Label29: TLabel
             Left = 12
             Top = 107
@@ -8717,7 +8723,7 @@ object mainForm: TmainForm
         object gbOnlinePDB: TGroupBox
           Left = 0
           Top = 127
-          Width = 229
+          Width = 264
           Height = 52
           Margins.Left = 2
           Margins.Top = 2
@@ -8727,6 +8733,7 @@ object mainForm: TmainForm
           Caption = 'Online Protein Database'
           TabOrder = 1
           Visible = False
+          ExplicitWidth = 229
           object Label18: TLabel
             Left = 12
             Top = 19
@@ -8769,15 +8776,17 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
+        ExplicitWidth = 229
         object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3
           Top = 288
-          Width = 223
+          Width = 258
           Height = 73
           Align = alTop
           Caption = '3D Vision'
           TabOrder = 3
+          ExplicitWidth = 223
           object lbl3DVisionType: TLabel
             Left = 9
             Top = 21
@@ -8823,11 +8832,12 @@ object mainForm: TmainForm
           AlignWithMargins = True
           Left = 3
           Top = 87
-          Width = 223
+          Width = 258
           Height = 103
           Align = alTop
           Caption = 'Shadows'
           TabOrder = 1
+          ExplicitWidth = 223
           object lblRayIterations: TLabel
             Left = 9
             Top = 50
@@ -8895,11 +8905,12 @@ object mainForm: TmainForm
           AlignWithMargins = True
           Left = 3
           Top = 196
-          Width = 223
+          Width = 258
           Height = 86
           Align = alTop
           Caption = 'Post Processing'
           TabOrder = 2
+          ExplicitWidth = 223
           object Label16: TLabel
             Left = 9
             Top = 31
@@ -8944,7 +8955,7 @@ object mainForm: TmainForm
         object rgMisc: TRadioGroup
           Left = 0
           Top = 364
-          Width = 229
+          Width = 264
           Height = 96
           Margins.Left = 2
           Margins.Top = 2
@@ -8959,11 +8970,12 @@ object mainForm: TmainForm
             'Antialiasing')
           TabOrder = 4
           OnClick = rgMiscClick
+          ExplicitWidth = 229
         end
         object gbEnvironment: TGroupBox
           Left = 0
           Top = 0
-          Width = 229
+          Width = 264
           Height = 84
           Margins.Left = 2
           Margins.Top = 2
@@ -8972,6 +8984,7 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Environment'
           TabOrder = 0
+          ExplicitWidth = 229
           object shBackgroundColor: TShape
             Left = 91
             Top = 22
@@ -9033,11 +9046,12 @@ object mainForm: TmainForm
           AlignWithMargins = True
           Left = 3
           Top = 463
-          Width = 223
+          Width = 258
           Height = 147
           Align = alTop
           Caption = 'Helpers'
           TabOrder = 5
+          ExplicitWidth = 223
           object cbBoundingBoxes: TCheckBox
             Left = 9
             Top = 24
@@ -9091,15 +9105,17 @@ object mainForm: TmainForm
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
+        ExplicitWidth = 229
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 223
+          Width = 258
           Height = 46
           Align = alTop
           Caption = 'Color'
           TabOrder = 0
+          ExplicitWidth = 223
           object shMaterialColor: TShape
             Left = 96
             Top = 15
@@ -9126,11 +9142,12 @@ object mainForm: TmainForm
           AlignWithMargins = True
           Left = 3
           Top = 151
-          Width = 223
+          Width = 258
           Height = 183
           Align = alTop
           Caption = 'Basic parameters'
           TabOrder = 2
+          ExplicitWidth = 223
           object Label7: TLabel
             Left = 16
             Top = 24
@@ -9305,55 +9322,56 @@ object mainForm: TmainForm
         object gbTextureIds: TGroupBox
           Left = 0
           Top = 417
-          Width = 229
+          Width = 264
           Height = 264
           Align = alTop
           Caption = 'Textures'
           TabOrder = 4
+          ExplicitWidth = 229
           object Label40: TLabel
-            Left = 8
+            Left = 12
             Top = 205
             Width = 68
             Height = 13
             Caption = 'Transparency:'
           end
           object Label39: TLabel
-            Left = 10
+            Left = 12
             Top = 149
             Width = 51
             Height = 13
             Caption = 'Reflection:'
           end
           object Label38: TLabel
-            Left = 119
+            Left = 139
             Top = 89
             Width = 45
             Height = 13
             Caption = 'Specular:'
           end
           object Label37: TLabel
-            Left = 8
+            Left = 12
             Top = 86
             Width = 36
             Height = 13
             Caption = 'Normal:'
           end
           object Label36: TLabel
-            Left = 121
+            Left = 141
             Top = 27
             Width = 30
             Height = 13
             Caption = 'Bump:'
           end
           object Label31: TLabel
-            Left = 8
-            Top = 24
+            Left = 12
+            Top = 27
             Width = 36
             Height = 13
             Caption = 'Diffuse:'
           end
           object imgDiffuseTexture: TImage
-            Left = 67
+            Left = 80
             Top = 23
             Width = 48
             Height = 48
@@ -9361,7 +9379,7 @@ object mainForm: TmainForm
             OnClick = imgDiffuseTextureClick
           end
           object imgBumpTexture: TImage
-            Left = 170
+            Left = 199
             Top = 23
             Width = 48
             Height = 48
@@ -9369,7 +9387,7 @@ object mainForm: TmainForm
             OnClick = imgBumpTextureClick
           end
           object imgNormalTexture: TImage
-            Left = 67
+            Left = 80
             Top = 87
             Width = 48
             Height = 48
@@ -9377,7 +9395,7 @@ object mainForm: TmainForm
             OnClick = imgNormalTextureClick
           end
           object imgSpecularTexture: TImage
-            Left = 170
+            Left = 199
             Top = 87
             Width = 48
             Height = 48
@@ -9385,7 +9403,7 @@ object mainForm: TmainForm
             OnClick = imgSpecularTextureClick
           end
           object imgReflectionTexture: TImage
-            Left = 116
+            Left = 80
             Top = 151
             Width = 48
             Height = 48
@@ -9393,22 +9411,38 @@ object mainForm: TmainForm
             OnClick = imgReflectionTextureClick
           end
           object imgTransparencyTexture: TImage
-            Left = 116
+            Left = 80
             Top = 205
             Width = 48
             Height = 48
             Stretch = True
             OnClick = imgTransparencyTextureClick
           end
+          object Label5: TLabel
+            Left = 139
+            Top = 153
+            Width = 50
+            Height = 13
+            Caption = 'Occlusion:'
+          end
+          object imgAmbientOcclusionTexture: TImage
+            Left = 199
+            Top = 151
+            Width = 48
+            Height = 48
+            Stretch = True
+            OnClick = imgAmbientOcclusionTextureClick
+          end
         end
         object gbIllumination: TGroupBox
           Left = 0
           Top = 52
-          Width = 229
+          Width = 264
           Height = 96
           Align = alTop
           Caption = 'Illumination'
           TabOrder = 1
+          ExplicitWidth = 229
           object Label6: TLabel
             Left = 8
             Top = 21
@@ -9476,11 +9510,12 @@ object mainForm: TmainForm
         object gbSpecularity: TGroupBox
           Left = 0
           Top = 337
-          Width = 229
+          Width = 264
           Height = 80
           Align = alTop
           Caption = 'Specularity'
           TabOrder = 3
+          ExplicitWidth = 229
           object Label3: TLabel
             Left = 16
             Top = 29
@@ -9543,10 +9578,11 @@ object mainForm: TmainForm
       object tsTextures: TTabSheet
         Caption = 'Textures'
         ImageIndex = 4
+        ExplicitWidth = 229
         object dgTextures: TDrawGrid
           Left = 0
           Top = 0
-          Width = 229
+          Width = 264
           Height = 642
           Align = alClient
           BevelOuter = bvRaised
@@ -9562,15 +9598,17 @@ object mainForm: TmainForm
           TabOrder = 0
           OnDrawCell = dgTexturesDrawCell
           OnSelectCell = dgTexturesSelectCell
+          ExplicitWidth = 229
         end
         object pnlManageTextures: TPanel
           Left = 0
           Top = 642
-          Width = 229
+          Width = 264
           Height = 41
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
+          ExplicitWidth = 229
           object btnAddTexture: TButton
             Left = 80
             Top = 6
@@ -9707,6 +9745,10 @@ object mainForm: TmainForm
     object miTransparentTexture: TMenuItem
       Caption = 'Transparent'
       OnClick = miTransparentTextureClick
+    end
+    object miAmbientOcclusionTexture: TMenuItem
+      Caption = 'Ambient Occlusion'
+      OnClick = miAmbientOcclusionTextureClick
     end
   end
 end

@@ -8034,7 +8034,6 @@ object mainForm: TmainForm
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseMove = pnlCenterMouseMove
-    ExplicitLeft = 239
     object img3DView: TImage
       Left = 6
       Top = 63
@@ -8591,21 +8590,18 @@ object mainForm: TmainForm
     Height = 713
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 239
     object pgParameters: TPageControl
       Left = 1
       Top = 1
       Width = 272
       Height = 711
-      ActivePage = tsMaterial
+      ActivePage = tsScene
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
       TabOrder = 0
-      ExplicitWidth = 237
       object tsControls: TTabSheet
         Caption = 'Controls'
-        ExplicitWidth = 229
         object rgMouseControls: TRadioGroup
           AlignWithMargins = True
           Left = 3
@@ -8622,7 +8618,6 @@ object mainForm: TmainForm
             'Post processing effects')
           TabOrder = 0
           OnClick = rgMouseControlsClick
-          ExplicitWidth = 223
         end
         object gbPDB: TGroupBox
           Left = 0
@@ -8633,7 +8628,6 @@ object mainForm: TmainForm
           Caption = 'Molecule Representation'
           TabOrder = 2
           Visible = False
-          ExplicitWidth = 229
           object Label29: TLabel
             Left = 12
             Top = 107
@@ -8733,7 +8727,6 @@ object mainForm: TmainForm
           Caption = 'Online Protein Database'
           TabOrder = 1
           Visible = False
-          ExplicitWidth = 229
           object Label18: TLabel
             Left = 12
             Top = 19
@@ -8776,7 +8769,6 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
-        ExplicitWidth = 229
         object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -8786,7 +8778,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = '3D Vision'
           TabOrder = 3
-          ExplicitWidth = 223
           object lbl3DVisionType: TLabel
             Left = 9
             Top = 21
@@ -8837,7 +8828,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Shadows'
           TabOrder = 1
-          ExplicitWidth = 223
           object lblRayIterations: TLabel
             Left = 9
             Top = 50
@@ -8910,7 +8900,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Post Processing'
           TabOrder = 2
-          ExplicitWidth = 223
           object Label16: TLabel
             Left = 9
             Top = 31
@@ -8938,7 +8927,9 @@ object mainForm: TmainForm
             Items.Strings = (
               '<none>'
               'Depth of Field'
-              'Ambient Occlusion')
+              'Ambient Occlusion'
+              'Radiosity'
+              'Contrast')
           end
           object sbPPIntensity: TScrollBar
             Left = 88
@@ -8970,7 +8961,6 @@ object mainForm: TmainForm
             'Antialiasing')
           TabOrder = 4
           OnClick = rgMiscClick
-          ExplicitWidth = 229
         end
         object gbEnvironment: TGroupBox
           Left = 0
@@ -8984,7 +8974,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Environment'
           TabOrder = 0
-          ExplicitWidth = 229
           object shBackgroundColor: TShape
             Left = 91
             Top = 22
@@ -9047,11 +9036,10 @@ object mainForm: TmainForm
           Left = 3
           Top = 463
           Width = 258
-          Height = 147
+          Height = 173
           Align = alTop
           Caption = 'Helpers'
           TabOrder = 5
-          ExplicitWidth = 223
           object cbBoundingBoxes: TCheckBox
             Left = 9
             Top = 24
@@ -9081,31 +9069,35 @@ object mainForm: TmainForm
             TabOrder = 2
             OnClick = cbDoubleSidedTrianglesClick
           end
-          object cbAdvancedRenderingFeatures: TCheckBox
-            Left = 9
-            Top = 93
-            Width = 181
-            Height = 17
-            Caption = 'Advanced Rendering Features'
-            TabOrder = 3
-            OnClick = cbDoubleSidedTrianglesClick
-          end
           object cbDraftMode: TCheckBox
             Left = 9
-            Top = 116
+            Top = 93
             Width = 181
             Height = 17
             Caption = 'Allow draft mode'
             Checked = True
             State = cbChecked
-            TabOrder = 4
+            TabOrder = 3
             OnClick = cbDoubleSidedTrianglesClick
+          end
+          object cbGlobalIllumination: TComboBox
+            Left = 10
+            Top = 116
+            Width = 180
+            Height = 21
+            Style = csDropDownList
+            ItemIndex = 0
+            TabOrder = 4
+            Text = '<none>'
+            Items.Strings = (
+              '<none>'
+              'Global Illumination'
+              'Random lightning')
           end
         end
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
-        ExplicitWidth = 229
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -9115,7 +9107,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Color'
           TabOrder = 0
-          ExplicitWidth = 223
           object shMaterialColor: TShape
             Left = 96
             Top = 15
@@ -9147,7 +9138,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Basic parameters'
           TabOrder = 2
-          ExplicitWidth = 223
           object Label7: TLabel
             Left = 16
             Top = 24
@@ -9327,7 +9317,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Textures'
           TabOrder = 4
-          ExplicitWidth = 229
           object Label40: TLabel
             Left = 12
             Top = 205
@@ -9442,7 +9431,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Illumination'
           TabOrder = 1
-          ExplicitWidth = 229
           object Label6: TLabel
             Left = 8
             Top = 21
@@ -9515,7 +9503,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Specularity'
           TabOrder = 3
-          ExplicitWidth = 229
           object Label3: TLabel
             Left = 16
             Top = 29
@@ -9578,7 +9565,6 @@ object mainForm: TmainForm
       object tsTextures: TTabSheet
         Caption = 'Textures'
         ImageIndex = 4
-        ExplicitWidth = 229
         object dgTextures: TDrawGrid
           Left = 0
           Top = 0
@@ -9598,7 +9584,6 @@ object mainForm: TmainForm
           TabOrder = 0
           OnDrawCell = dgTexturesDrawCell
           OnSelectCell = dgTexturesSelectCell
-          ExplicitWidth = 229
         end
         object pnlManageTextures: TPanel
           Left = 0
@@ -9608,7 +9593,6 @@ object mainForm: TmainForm
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
-          ExplicitWidth = 229
           object btnAddTexture: TButton
             Left = 80
             Top = 6

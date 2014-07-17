@@ -194,7 +194,7 @@ Function RayTracer_SetSceneInfo(
    maxPathTracingIterations : Integer;
    outputType: integer;
    timer: integer; fogEffect: integer; isometric3D: integer;
-   doubleSidedTriangles, gradientBackGround, advancedFeatures: integer;
+   doubleSidedTriangles, gradientBackGround, globalIllumination: integer;
    sbyboxSize, skyboxMaterialId: integer ) : Integer; cdecl; external RAYTRACERMODULE_DLL;
 
 Function RayTracer_SetPostProcessingInfo(

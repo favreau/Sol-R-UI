@@ -91,7 +91,6 @@ type
     Label31: TLabel;
     cbDoubleSidedTriangles: TCheckBox;
     cbGradientBackGround: TCheckBox;
-    cbAdvancedRenderingFeatures: TCheckBox;
     cbDraftMode: TCheckBox;
     miHiResScreenshot: TMenuItem;
     N2: TMenuItem;
@@ -164,6 +163,7 @@ type
     Label5: TLabel;
     imgAmbientOcclusionTexture: TImage;
     miAmbientOcclusionTexture: TMenuItem;
+    cbGlobalIllumination: TComboBox;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -388,7 +388,8 @@ var
   filename: string;
 begin
   i := 0;
-  if FindFirst(texFolder+'\' + filter, faAnyFile, SR) = 0 then
+  memLogs.Lines.Add('Loading textures from ' + ApplicationFolder+texFolder+'\' + filter);
+  if FindFirst(ApplicationFolder+texFolder+'\' + filter, faAnyFile, SR) = 0 then
   repeat
     filename := ApplicationFolder+texFolder+'\'+SR.Name;
     status := RayTracer_LoadTextureFromFile( i, AnsiString(filename) );
@@ -645,9 +646,11 @@ begin
   previousSelectedMaterial  := -1;
 
   // 3D View
-  viewPos.x := 1; viewPos.y := 0; viewPos.z := -10000;
+  viewPos.x := 1; viewPos.y := 0; viewPos.z := -15000;
   viewDir.x := 1; viewDir.y := 0; viewDir.z := -5000;
-  viewAngles.x := 0.5; viewAngles.y := 0.5; viewAngles.z := 0;
+  viewAngles.x := 0.5;
+  viewAngles.y := -0.5;
+  viewAngles.z := 0;
 
   lampPos.x := 5000;
   lampPos.y := 5000;
@@ -1002,7 +1005,7 @@ begin
       rgMisc.ItemIndex,
       integer(cbDoubleSidedTriangles.Checked),
       integer(cbGradientBackGround.Checked),
-      integer(cbAdvancedRenderingFeatures.Checked),
+      cbGlobalIllumination.ItemIndex,
       sbViewDistance.Position*450,SKYBOX_SPHERE_MATERIAL);
   end;
 end;
@@ -1215,7 +1218,7 @@ var
 begin
   if FKernelInitialized then
   begin
-    FCurrentPrimitive := RayTracer_GetPrimitiveAt(x,img3DView.Height-y);
+    FCurrentPrimitive := RayTracer_GetPrimitiveAt(img3DView.Width-x,img3DView.Height-y);
     lblPrimitiveID.Caption := 'Primitive ID: ' + IntToStr(FCurrentPrimitive);
   end;
 
@@ -1239,9 +1242,9 @@ begin
               else
               if( ssAlt in Shift ) then
               begin
-                viewPos.x := viewPos.x + 20*( mx - previousMouseX );
+                viewPos.x := viewPos.x - 20*( mx - previousMouseX );
                 viewPos.y := viewPos.y + 20*( my - previousMouseY );
-                viewDir.x := viewDir.x + 20*( mx - previousMouseX );
+                viewDir.x := viewDir.x - 20*( mx - previousMouseX );
                 viewDir.y := viewDir.y + 20*( my - previousMouseY );
               end
               else
@@ -1252,7 +1255,7 @@ begin
             end;
             2: // light source
             begin
-              lampPos.x := lampPos.x - 50*( mx - previousMouseX );
+              lampPos.x := lampPos.x + 50*( mx - previousMouseX );
               lampPos.y := lampPos.y - 50*( my - previousMouseY );
               lamp := RayTracer_GetLight(0);
               RayTracer_SetPrimitive(
@@ -1278,14 +1281,14 @@ begin
             begin
               value := (previousMouseX - mx)/100;
               if abs(value)<1 then
-                viewAngles.y :=  viewAngles.y + ArcSin(value);
+                viewAngles.y :=  viewAngles.y - ArcSin(value);
               value := (previousMouseY - my)/100;
               if abs(value)<1 then
                 viewAngles.x :=  viewAngles.x + ArcSin(value);
             end;
             2: // light source
             begin
-              lampPos.x := lampPos.x - 50*( mx - previousMouseX );
+              lampPos.x := lampPos.x + 50*( mx - previousMouseX );
               lampPos.z := lampPos.z - 50*( my - previousMouseY );
               lamp := RayTracer_GetLight(0);
               RayTracer_SetPrimitive(
@@ -1308,7 +1311,7 @@ begin
               angles.y := 0;
               value := (previousMouseX - mx)/100;
               if abs(value)<1 then
-                viewAngles.y :=  viewAngles.y + ArcSin(value);
+                viewAngles.y :=  viewAngles.y - ArcSin(value);
               value := (previousMouseY - my)/100;
               if abs(value)<1 then
                 viewAngles.x :=  viewAngles.x + ArcSin(value);

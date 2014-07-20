@@ -8595,7 +8595,7 @@ object mainForm: TmainForm
       Top = 1
       Width = 272
       Height = 711
-      ActivePage = tsScene
+      ActivePage = tsControls
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
@@ -9060,12 +9060,12 @@ object mainForm: TmainForm
             TabOrder = 1
             OnClick = cbDoubleSidedTrianglesClick
           end
-          object cbGradientBackGround: TCheckBox
+          object cbExtendedGeometry: TCheckBox
             Left = 9
             Top = 70
-            Width = 137
+            Width = 235
             Height = 17
-            Caption = 'Gradient Background'
+            Caption = 'Extended Geometry (Spheres, Cylinders, etc.)'
             TabOrder = 2
             OnClick = cbDoubleSidedTrianglesClick
           end

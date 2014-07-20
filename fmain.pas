@@ -90,7 +90,7 @@ type
     Label36: TLabel;
     Label31: TLabel;
     cbDoubleSidedTriangles: TCheckBox;
-    cbGradientBackGround: TCheckBox;
+    cbExtendedGeometry: TCheckBox;
     cbDraftMode: TCheckBox;
     miHiResScreenshot: TMenuItem;
     N2: TMenuItem;
@@ -563,7 +563,7 @@ begin
       SKYBOX_BOTTOM_MATERIAL: begin diffuseTextureId:=5; wireFrame:=1; end;
 
       SKYBOX_SPHERE_MATERIAL: begin r:=1; g:=1; b:=1; wireFrame:=2; diffuseTextureId:=6; end;
-      SKYBOX_GROUND_MATERIAL: begin r:=1; g:=1; b:=1; end;
+      SKYBOX_GROUND_MATERIAL: begin r:=0; g:=0; b:=0; reflection:=0.2; end;
 
       // Fractals
       MANDELBROT_MATERIAL: begin r:=127/255; g:=127/255; b:=127/255; diffuseTextureId:=TEXTURE_MANDELBROT; end;
@@ -1004,7 +1004,7 @@ begin
       0,
       rgMisc.ItemIndex,
       integer(cbDoubleSidedTriangles.Checked),
-      integer(cbGradientBackGround.Checked),
+      integer(cbExtendedGeometry.Checked),
       cbGlobalIllumination.ItemIndex,
       sbViewDistance.Position*450,SKYBOX_SPHERE_MATERIAL);
   end;

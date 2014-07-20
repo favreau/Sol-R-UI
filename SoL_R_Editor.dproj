@@ -262,13 +262,13 @@ $(PostBuildEvent)]]></PostBuildEvent>
             </Platforms>
             <ModelSupport>False</ModelSupport>
             <Deployment>
+                <DeployFile LocalName="E:\Deployments\bin\SoL_R_Editor.exe" Configuration="OpenCL Release" Class="ProjectOutput">
+                    <Platform Name="Win64"/>
+                </DeployFile>
                 <DeployFile LocalName="E:\Deployments\bin\SoL_R_Editor.rsm" Configuration="OpenCL Release" Class="DebugSymbols">
                     <Platform Name="Win64">
                         <RemoteName>SoL_R_Editor.rsm</RemoteName>
                     </Platform>
-                </DeployFile>
-                <DeployFile LocalName="E:\Deployments\bin\SoL_R_Editor.exe" Configuration="OpenCL Release" Class="ProjectOutput">
-                    <Platform Name="Win64"/>
                 </DeployFile>
                 <DeployClass Required="true" Name="DependencyPackage">
                     <Platform Name="iOSDevice">

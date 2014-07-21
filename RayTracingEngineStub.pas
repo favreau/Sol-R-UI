@@ -113,7 +113,8 @@ Type
     ppe_none             = 0,
     ppe_depthOfField     = 1,
     ppe_ambientOcclusion = 2,
-    ppe_cartoon          = 3 );
+    ppe_radiosity        = 3,
+    ppe_filters          = 4 );
 
   TOutputType = (
     ot_OpenGL = 0,

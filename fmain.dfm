@@ -8595,7 +8595,7 @@ object mainForm: TmainForm
       Top = 1
       Width = 272
       Height = 711
-      ActivePage = tsControls
+      ActivePage = tsScene
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
@@ -8645,7 +8645,7 @@ object mainForm: TmainForm
           object sbDefaultAtomSize: TScrollBar
             Left = 88
             Top = 107
-            Width = 121
+            Width = 159
             Height = 17
             Max = 200
             Min = 10
@@ -8657,7 +8657,7 @@ object mainForm: TmainForm
           object sbStickSize: TScrollBar
             Left = 88
             Top = 136
-            Width = 121
+            Width = 159
             Height = 17
             Max = 200
             Min = 10
@@ -8669,7 +8669,7 @@ object mainForm: TmainForm
           object cbGeometryType: TComboBox
             Left = 12
             Top = 25
-            Width = 198
+            Width = 235
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -8686,7 +8686,7 @@ object mainForm: TmainForm
           object cbRepresentation: TComboBox
             Left = 12
             Top = 49
-            Width = 198
+            Width = 235
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -8701,7 +8701,7 @@ object mainForm: TmainForm
           object cbTheme: TComboBox
             Left = 12
             Top = 75
-            Width = 198
+            Width = 235
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -8769,14 +8769,10 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3
-          Top = 288
+          Top = 304
           Width = 258
           Height = 73
           Align = alTop
@@ -8799,7 +8795,7 @@ object mainForm: TmainForm
           object cb3DVision: TComboBox
             Left = 88
             Top = 16
-            Width = 121
+            Width = 156
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -8814,7 +8810,7 @@ object mainForm: TmainForm
           object sbWith3DVision: TScrollBar
             Left = 88
             Top = 43
-            Width = 121
+            Width = 156
             Height = 17
             Ctl3D = True
             PageSize = 0
@@ -8849,7 +8845,7 @@ object mainForm: TmainForm
           object sbRayInterations: TScrollBar
             Left = 95
             Top = 49
-            Width = 114
+            Width = 149
             Height = 17
             Min = 1
             PageSize = 0
@@ -8860,7 +8856,7 @@ object mainForm: TmainForm
           object sbViewDistance: TScrollBar
             Left = 95
             Top = 74
-            Width = 114
+            Width = 149
             Height = 17
             PageSize = 0
             Position = 100
@@ -8870,7 +8866,7 @@ object mainForm: TmainForm
           object sbShadowIntensity: TScrollBar
             Left = 95
             Top = 25
-            Width = 114
+            Width = 149
             Height = 17
             PageSize = 0
             Position = 80
@@ -8900,7 +8896,7 @@ object mainForm: TmainForm
           Left = 3
           Top = 196
           Width = 258
-          Height = 86
+          Height = 102
           Align = alTop
           Caption = 'Post Processing'
           TabOrder = 2
@@ -8913,15 +8909,22 @@ object mainForm: TmainForm
           end
           object Label17: TLabel
             Left = 9
-            Top = 50
+            Top = 54
             Width = 43
             Height = 13
             Caption = 'Strength:'
           end
+          object Label12: TLabel
+            Left = 9
+            Top = 77
+            Width = 25
+            Height = 13
+            Caption = 'Filter:'
+          end
           object cbPostProcessing: TComboBox
             Left = 88
             Top = 24
-            Width = 121
+            Width = 156
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -8932,13 +8935,13 @@ object mainForm: TmainForm
               '<none>'
               'Depth of Field'
               'Ambient Occlusion'
-              'Radiosity'
-              'Contrast')
+              'Rays depth'
+              'Filters')
           end
           object sbPPIntensity: TScrollBar
             Left = 88
             Top = 51
-            Width = 121
+            Width = 156
             Height = 17
             Min = 30
             PageSize = 0
@@ -8946,10 +8949,28 @@ object mainForm: TmainForm
             TabOrder = 1
             OnChange = sbPPIntensityChange
           end
+          object cbFilters: TComboBox
+            Left = 87
+            Top = 74
+            Width = 157
+            Height = 21
+            Style = csDropDownList
+            ItemIndex = 0
+            TabOrder = 2
+            Text = 'Emboss'
+            OnChange = cbPostProcessingChange
+            Items.Strings = (
+              'Emboss'
+              'Edge detection'
+              'Sharpen'
+              'Blur'
+              'Motion Blur'
+              'Subtle sharpen')
+          end
         end
         object rgMisc: TRadioGroup
           Left = 0
-          Top = 364
+          Top = 380
           Width = 264
           Height = 96
           Margins.Left = 2
@@ -9008,7 +9029,7 @@ object mainForm: TmainForm
           object cbScene: TComboBox
             Left = 90
             Top = 51
-            Width = 122
+            Width = 157
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -9025,7 +9046,7 @@ object mainForm: TmainForm
           object sbAmbientLightIntensity: TScrollBar
             Left = 126
             Top = 28
-            Width = 86
+            Width = 121
             Height = 17
             Max = 10
             Min = 1
@@ -9038,7 +9059,7 @@ object mainForm: TmainForm
         object gbHelpers: TGroupBox
           AlignWithMargins = True
           Left = 3
-          Top = 463
+          Top = 479
           Width = 258
           Height = 173
           Align = alTop
@@ -9087,7 +9108,7 @@ object mainForm: TmainForm
           object cbGlobalIllumination: TComboBox
             Left = 10
             Top = 116
-            Width = 180
+            Width = 234
             Height = 21
             Style = csDropDownList
             ItemIndex = 0
@@ -9102,10 +9123,6 @@ object mainForm: TmainForm
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -9193,7 +9210,7 @@ object mainForm: TmainForm
           object sbReflection: TScrollBar
             Left = 88
             Top = 24
-            Width = 80
+            Width = 114
             Height = 17
             PageSize = 0
             TabOrder = 0
@@ -9202,7 +9219,7 @@ object mainForm: TmainForm
           object sbTransparency: TScrollBar
             Left = 88
             Top = 48
-            Width = 80
+            Width = 114
             Height = 17
             PageSize = 0
             TabOrder = 2
@@ -9211,7 +9228,7 @@ object mainForm: TmainForm
           object sbRefraction: TScrollBar
             Left = 88
             Top = 72
-            Width = 80
+            Width = 114
             Height = 17
             Max = 500
             PageSize = 0
@@ -9221,7 +9238,7 @@ object mainForm: TmainForm
           object sbNoise: TScrollBar
             Left = 88
             Top = 96
-            Width = 80
+            Width = 114
             Height = 17
             PageSize = 0
             TabOrder = 6
@@ -9250,7 +9267,7 @@ object mainForm: TmainForm
           object sbOpacity: TScrollBar
             Left = 88
             Top = 119
-            Width = 80
+            Width = 114
             Height = 17
             Max = 1000
             PageSize = 100
@@ -9258,7 +9275,7 @@ object mainForm: TmainForm
             OnChange = sbOpacityChange
           end
           object meReflection: TMaskEdit
-            Left = 174
+            Left = 208
             Top = 21
             Width = 36
             Height = 21
@@ -9270,7 +9287,7 @@ object mainForm: TmainForm
             OnExit = meReflectionExit
           end
           object meTransparency: TMaskEdit
-            Left = 174
+            Left = 208
             Top = 45
             Width = 36
             Height = 21
@@ -9282,7 +9299,7 @@ object mainForm: TmainForm
             OnExit = meTransparencyExit
           end
           object meRefraction: TMaskEdit
-            Left = 174
+            Left = 208
             Top = 69
             Width = 36
             Height = 21
@@ -9294,7 +9311,7 @@ object mainForm: TmainForm
             OnExit = meRefractionExit
           end
           object meNoise: TMaskEdit
-            Left = 174
+            Left = 208
             Top = 92
             Width = 36
             Height = 21
@@ -9306,7 +9323,7 @@ object mainForm: TmainForm
             OnExit = meNoiseExit
           end
           object meOpacity: TMaskEdit
-            Left = 174
+            Left = 208
             Top = 116
             Width = 36
             Height = 21
@@ -9462,8 +9479,8 @@ object mainForm: TmainForm
           end
           object sbInnerIllumination: TScrollBar
             Left = 80
-            Top = 21
-            Width = 80
+            Top = 20
+            Width = 125
             Height = 17
             Max = 200
             PageSize = 0
@@ -9471,8 +9488,8 @@ object mainForm: TmainForm
             OnChange = sbSpecCoefChange
           end
           object meInnerIllumination: TMaskEdit
-            Left = 166
-            Top = 18
+            Left = 211
+            Top = 16
             Width = 36
             Height = 21
             Alignment = taRightJustify
@@ -9485,7 +9502,7 @@ object mainForm: TmainForm
           object sbIlluminationDiffusion: TScrollBar
             Left = 80
             Top = 43
-            Width = 122
+            Width = 167
             Height = 17
             PageSize = 0
             Position = 100
@@ -9495,7 +9512,7 @@ object mainForm: TmainForm
           object sbIlluminationPropagation: TScrollBar
             Left = 80
             Top = 66
-            Width = 122
+            Width = 167
             Height = 17
             PageSize = 0
             Position = 100
@@ -9526,9 +9543,9 @@ object mainForm: TmainForm
             Caption = 'Power:'
           end
           object sbSpecValue: TScrollBar
-            Left = 88
+            Left = 91
             Top = 29
-            Width = 80
+            Width = 114
             Height = 17
             PageSize = 0
             Position = 100
@@ -9536,9 +9553,9 @@ object mainForm: TmainForm
             OnChange = sbSpecValueChange
           end
           object sbSpecPower: TScrollBar
-            Left = 88
+            Left = 91
             Top = 53
-            Width = 80
+            Width = 114
             Height = 17
             PageSize = 0
             Position = 1
@@ -9546,7 +9563,7 @@ object mainForm: TmainForm
             OnChange = sbSpecPowerChange
           end
           object meSpecPower: TMaskEdit
-            Left = 174
+            Left = 211
             Top = 50
             Width = 36
             Height = 21
@@ -9557,7 +9574,7 @@ object mainForm: TmainForm
             Text = ' .  '
           end
           object meSpecValue: TMaskEdit
-            Left = 174
+            Left = 211
             Top = 26
             Width = 36
             Height = 21
@@ -9573,10 +9590,6 @@ object mainForm: TmainForm
       object tsTextures: TTabSheet
         Caption = 'Textures'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object dgTextures: TDrawGrid
           Left = 0
           Top = 0

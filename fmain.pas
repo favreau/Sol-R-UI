@@ -164,6 +164,8 @@ type
     imgAmbientOcclusionTexture: TImage;
     miAmbientOcclusionTexture: TMenuItem;
     cbGlobalIllumination: TComboBox;
+    cbFilters: TComboBox;
+    Label12: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -673,14 +675,21 @@ begin
 end;
 
 procedure TmainForm.RenderScene;
+var
+  param: integer;
 begin
   if( SceneInitialized ) then
   begin
+    if(cbPostProcessing.ItemIndex=integer(ppe_filters)) then
+      param :=cbFilters.ItemIndex
+    else
+      param := sbPPIntensity.Position;
+
     RayTracer_SetPostProcessingInfo(
       cbPostProcessing.itemIndex,
       postProcessingParam,
       sbPPIntensity.Position*50,
-      sbPPIntensity.Position);
+      param);
 
     RayTracer_SetCamera(
       viewPos.x, viewPos.y, viewPos.z,

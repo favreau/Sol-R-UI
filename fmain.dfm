@@ -8595,7 +8595,7 @@ object mainForm: TmainForm
       Top = 1
       Width = 272
       Height = 711
-      ActivePage = tsScene
+      ActivePage = tsControls
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
@@ -9123,6 +9123,10 @@ object mainForm: TmainForm
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -9590,6 +9594,10 @@ object mainForm: TmainForm
       object tsTextures: TTabSheet
         Caption = 'Textures'
         ImageIndex = 4
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object dgTextures: TDrawGrid
           Left = 0
           Top = 0

@@ -1448,7 +1448,7 @@ begin
   pgParameters.ActivePage := tsControls;
 
   groundHeight := -2510;
-  tiles:=20;
+  tiles:=1;
 
   Initialize;
 
@@ -1480,7 +1480,7 @@ begin
     DEFAULT_LIGHT_MATERIAL);
 
   // Create Scene
-  boxSize:=sbViewDistance.Position*500*0.8;
+  boxSize:=sbViewDistance.Position*500*0.3;
   case cbScene.ItemIndex of
     0: ;// nothing
     1: // Ground

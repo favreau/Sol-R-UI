@@ -8769,6 +8769,10 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3

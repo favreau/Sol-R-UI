@@ -8595,7 +8595,7 @@ object mainForm: TmainForm
       Top = 1
       Width = 272
       Height = 711
-      ActivePage = tsControls
+      ActivePage = tsScene
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
@@ -8627,7 +8627,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Molecule Representation'
           TabOrder = 2
-          Visible = False
           object Label29: TLabel
             Left = 12
             Top = 107
@@ -9110,7 +9109,7 @@ object mainForm: TmainForm
             OnClick = cbDoubleSidedTrianglesClick
           end
           object cbGlobalIllumination: TComboBox
-            Left = 10
+            Left = 9
             Top = 116
             Width = 234
             Height = 21
@@ -9120,17 +9119,14 @@ object mainForm: TmainForm
             Text = '<none>'
             Items.Strings = (
               '<none>'
-              'Global Illumination'
+              'Global Illumination (Environment only)'
+              'Advanced Global Illumination (All objects)'
               'Random lightning')
           end
         end
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -9598,10 +9594,6 @@ object mainForm: TmainForm
       object tsTextures: TTabSheet
         Caption = 'Textures'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object dgTextures: TDrawGrid
           Left = 0
           Top = 0
@@ -9734,7 +9726,7 @@ object mainForm: TmainForm
     Top = 112
   end
   object odImage: TOpenDialog
-    Filter = 'Supported formats|*.png;*.jpg;*.bmp'
+    Filter = 'Supported formats|*.tga;*.jpg;*.bmp'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
     Title = 'Open file'
     Left = 320

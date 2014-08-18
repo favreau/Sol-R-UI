@@ -8035,7 +8035,7 @@ object mainForm: TmainForm
     TabOrder = 0
     OnMouseMove = pnlCenterMouseMove
     object img3DView: TImage
-      Left = 6
+      Left = 5
       Top = 63
       Width = 512
       Height = 512
@@ -8552,7 +8552,7 @@ object mainForm: TmainForm
         Top = 6
         Width = 377
         Height = 17
-        Max = 99
+        Max = 999
         Step = 1
         TabOrder = 0
       end
@@ -8595,7 +8595,7 @@ object mainForm: TmainForm
       Top = 1
       Width = 272
       Height = 711
-      ActivePage = tsScene
+      ActivePage = tsControls
       Align = alClient
       DoubleBuffered = True
       ParentDoubleBuffered = False
@@ -8768,10 +8768,6 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -9083,8 +9079,6 @@ object mainForm: TmainForm
             Width = 137
             Height = 17
             Caption = 'Double Sided Triangles'
-            Checked = True
-            State = cbChecked
             TabOrder = 1
             OnClick = cbDoubleSidedTrianglesClick
           end

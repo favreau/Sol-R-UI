@@ -295,7 +295,7 @@ type
     procedure setMaterialControls;
 
     {textures}
-    procedure loadTextures( filter: string );
+    procedure loadTextures( folder: string; filter: string );
 
     procedure activateTextureTab(Sender: TObject);
 
@@ -381,34 +381,40 @@ const
   irtFolder = 'irt';
   objFolder = 'models';
   texFolder = 'textures';
+  hdriFolder = 'hdri';
 
-procedure TmainForm.loadTextures( filter: string );
+procedure TmainForm.loadTextures( folder: string; filter: string );
 var
-  i: integer;
+  n,i: integer;
   SR: TSearchRec;
   status : integer;
   filename: string;
 begin
+  n := RayTracer_GetNbTextures;
   i := 0;
-  memLogs.Lines.Add('Loading textures from ' + ApplicationFolder+texFolder+'\' + filter);
-  if FindFirst(ApplicationFolder+texFolder+'\' + filter, faAnyFile, SR) = 0 then
+  if FindFirst(ApplicationFolder+folder+'\' + filter, faAnyFile, SR) = 0 then
   repeat
-    filename := ApplicationFolder+texFolder+'\'+SR.Name;
-    status := RayTracer_LoadTextureFromFile( i, AnsiString(filename) );
+    filename := ApplicationFolder+folder+'\'+SR.Name;
+    status := RayTracer_LoadTextureFromFile( n+i, AnsiString(filename) );
     if( status=-1 ) then
       memLogs.Lines.Add('Failed to load ' + filename);
     inc(i);
   until FindNext(SR) <> 0;
   FindClose(SR);
+  memLogs.Lines.Add(intToStr(i) + ' textures loaded from ' + ApplicationFolder+folder+'\' + filter);
 end;
 
 procedure TmainForm.initializeMaterials;
 var
   i: integer;
 begin
-  loadTextures('*.bmp');
-  loadTextures('*.jpg');
-  loadTextures('*.tga');
+  loadTextures(hdriFolder, '*.bmp');
+  loadTextures(hdriFolder, '*.jpg');
+  loadTextures(hdriFolder, '*.tga');
+
+  loadTextures(texFolder, '*.bmp');
+  loadTextures(texFolder, '*.jpg');
+  loadTextures(texFolder, '*.tga');
 
   i := RayTracer_GetNbTextures;
   memLogs.Lines.Add( IntToStr(i) + ' textures loaded');
@@ -564,7 +570,7 @@ begin
       SKYBOX_TOP_MATERIAL   : begin diffuseTextureId:=4; wireFrame:=1; end;
       SKYBOX_BOTTOM_MATERIAL: begin diffuseTextureId:=5; wireFrame:=1; end;
 
-      SKYBOX_SPHERE_MATERIAL: begin r:=1; g:=1; b:=1; wireFrame:=2; diffuseTextureId:=6; end;
+      SKYBOX_SPHERE_MATERIAL: begin r:=1; g:=1; b:=1; wireFrame:=2; diffuseTextureId:=0; end;
       SKYBOX_GROUND_MATERIAL: begin r:=0.5; g:=0.5; b:=0.5; reflection:=0.2; end;
 
       // Fractals
@@ -574,7 +580,7 @@ begin
       // Basic reflection
       BASIC_REFLECTION_MATERIAL_001: begin reflection:=0.5; refraction:=1.6; transparency:=0.7; end;
       BASIC_REFLECTION_MATERIAL_002: begin reflection:=0.9; end;
-      BASIC_REFLECTION_MATERIAL_003: begin r:=0.5; g:=1.0; b:=0.7; reflection:=0; diffuseTextureId:=6; bumpTextureId:=8; end;
+      BASIC_REFLECTION_MATERIAL_003: begin r:=0.5; g:=1.0; b:=0.7; reflection:=0; diffuseTextureId:=0; bumpTextureId:=8; end;
       BASIC_REFLECTION_MATERIAL_004: begin reflection:=1; refraction:=1.66; transparency:=0.95; end;
       BASIC_REFLECTION_MATERIAL_005: begin r:=1; g:=0; b:=0; reflection:=0.5; end;
       BASIC_REFLECTION_MATERIAL_006: begin r:=0; g:=1; b:=1; reflection:=0.5; end;
@@ -1369,10 +1375,10 @@ begin
 
     tsMaterial.Enabled := true;
     pgParameters.ActivePage := tsMaterial;
-    gbIllumination.Visible := (FCurrentMaterial.innerIllumination<>0);
-    gbBasicParameters.Visible := (FCurrentMaterial.innerIllumination=0);
-    gbTextureIds.Visible := (FCurrentMaterial.innerIllumination=0);
-    gbSpecularity.Visible := (FCurrentMaterial.innerIllumination=0);
+    //gbIllumination.Visible := (FCurrentMaterial.innerIllumination<>0);
+    //gbBasicParameters.Visible := (FCurrentMaterial.innerIllumination=0);
+    //gbTextureIds.Visible := (FCurrentMaterial.innerIllumination=0);
+    //gbSpecularity.Visible := (FCurrentMaterial.innerIllumination=0);
   end;
 end;
 

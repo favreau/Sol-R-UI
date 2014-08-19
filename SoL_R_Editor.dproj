@@ -3,7 +3,7 @@
         <ProjectGuid>{674624EC-387B-496B-B8B2-A1079371EF34}</ProjectGuid>
         <MainSource>SoL_R_Editor.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">CUDA Release</Config>
+        <Config Condition="'$(Config)'==''">OpenCL Release</Config>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -123,6 +123,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=Cyrille Favreau;FileDescription=SoL-R Editor;FileVersion=0.2.0.0;InternalName=SoL_R_Edior.exe;LegalCopyright=Copyright (C) 2014 Cyrille Favreau;LegalTrademarks=;OriginalFilename=;ProductName=SoL-R;ProductVersion=0.2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_MajorVer>0</VerInfo_MajorVer>
         <DCC_DebugInformation>false</DCC_DebugInformation>
         <Debugger_CWD>E:\Deployments\bin</Debugger_CWD>
         <PostBuildEvent><![CDATA[copy $(OUTPUTDIR)$(OUTPUTNAME)$(OUTPUTEXT) $(OUTPUTDIR)$(OUTPUTNAME)_Cuda$(OUTPUTEXT)
@@ -130,7 +133,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <Debugger_RunParams>_-objFile=&quot;E:\Deployments\bin\irt\africanboy.irt&quot;</Debugger_RunParams>
         <DCC_Define>CUDA;$(DCC_Define)</DCC_Define>
         <DCC_ExeOutput>E:\Deployments\bin\</DCC_ExeOutput>
-        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Locale>1036</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_DcuOutput>.\dcu\x64</DCC_DcuOutput>
     </PropertyGroup>

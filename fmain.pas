@@ -1445,6 +1445,7 @@ var
   groundHeight : double;
   boxSize : double;
   tiles: integer;
+  filename, extension: string;
 begin
   Timer.Enabled := false;
   cbContinuousRendering.Checked := false;
@@ -1461,13 +1462,21 @@ begin
   // Load Files
   case currentModel.modelType of
     mtPDB:
-      nbPrimitives := RayTracer_LoadMolecule(
-        currentModel.Filename,
-        TGeometryType( cbGeometryType.ItemIndex ),
-        sbDefaultAtomSize.Position,
-        sbStickSize.Position,
-        cbRepresentation.ItemIndex,
-        50);
+      begin
+        memLogs.Lines.Add('Loading ' + string(currentModel.Filename) + '...' );
+        nbPrimitives := RayTracer_LoadMolecule(
+          currentModel.Filename,
+          TGeometryType( cbGeometryType.ItemIndex ),
+          sbDefaultAtomSize.Position,
+          sbStickSize.Position,
+          cbRepresentation.ItemIndex,
+          75);
+        extension := ExtractFileExt(string(currentModel.filename));
+        filename := StringReplace(string(currentModel.filename),extension,'.obj',[rfReplaceAll, rfIgnoreCase]);
+        memLogs.Lines.Add('Loading ' + filename + '...' );
+        RayTracer_LoadOBJModel(AnsiString(filename),20,1,5000,1,groundHeight);
+        cbExtendedGeometry.Checked := true;
+      end;
     mtOBJ:
       RayTracer_LoadOBJModel(currentModel.Filename,0,1,5000,1,groundHeight);
     mtIRT:

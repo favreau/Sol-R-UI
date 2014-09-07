@@ -1455,7 +1455,7 @@ begin
   pgParameters.ActivePage := tsControls;
 
   groundHeight := -2510;
-  tiles:=1;
+  tiles:=10;
 
   Initialize;
 

@@ -12,11 +12,12 @@ type
     imgSolR: TImage;
     btnOk: TButton;
     miWebLink: TLabel;
-    imgFaceBook: TImage;
     Label1: TLabel;
+    Label2: TLabel;
     procedure miWebLinkClick(Sender: TObject);
     procedure imgSolRClick(Sender: TObject);
     procedure imgFaceBookClick(Sender: TObject);
+    procedure Label2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -43,9 +44,14 @@ begin
   miWebLinkClick(sender);
 end;
 
+procedure TfrmAbout.Label2Click(Sender: TObject);
+begin
+  ShellExecute(0, 'OPEN', PChar('https://www.linkedin.com/in/cyrillefavreau'), '', '', SW_SHOWNORMAL);
+end;
+
 procedure TfrmAbout.miWebLinkClick(Sender: TObject);
 begin
-  ShellExecute(0, 'OPEN', PChar('http://www.sol-r.eu'), '', '', SW_SHOWNORMAL);
+  ShellExecute(0, 'OPEN', PChar('http://www.molecular-visualization.com'), '', '', SW_SHOWNORMAL);
 end;
 
 end.

@@ -57,7 +57,7 @@ type
     Label16: TLabel;
     Label17: TLabel;
     cbPostProcessing: TComboBox;
-    sbPPIntensity: TScrollBar;
+    sbPPParam1: TScrollBar;
     rgMisc: TRadioGroup;
     gbEnvironment: TGroupBox;
     shBackgroundColor: TShape;
@@ -166,6 +166,9 @@ type
     cbGlobalIllumination: TComboBox;
     cbFilters: TComboBox;
     Label12: TLabel;
+    sbPPParam2: TScrollBar;
+    Label13: TLabel;
+    miWebLink: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -179,12 +182,6 @@ type
     procedure sbNoiseChange(Sender: TObject);
     procedure cbProceduralClick(Sender: TObject);
     procedure cbShadowsClick(Sender: TObject);
-    procedure sbShadowIntensityChange(Sender: TObject);
-    procedure sbRayInterationsChange(Sender: TObject);
-    procedure sbViewDistanceChange(Sender: TObject);
-    procedure cb3DVisionChange(Sender: TObject);
-    procedure sbWith3DVisionChange(Sender: TObject);
-    procedure cbBoundingBoxesClick(Sender: TObject);
     procedure img3DViewMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure img3DViewMouseUp(Sender: TObject; Button: TMouseButton;
@@ -193,8 +190,6 @@ type
     procedure btnOpenClick(Sender: TObject);
     procedure cbFixedSizeAtomClick(Sender: TObject);
     procedure cbSticksClick(Sender: TObject);
-    procedure sbPPIntensityChange(Sender: TObject);
-    procedure cbPostProcessingChange(Sender: TObject);
     procedure pnlCenterMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure sbDefaultAtomSizeChange(Sender: TObject);
@@ -213,7 +208,6 @@ type
     procedure edtMoleculeIdExit(Sender: TObject);
     procedure shBackgroundColorMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure rgMiscClick(Sender: TObject);
     procedure rgMouseControlsClick(Sender: TObject);
     procedure sbIlluminationDiffusionChange(Sender: TObject);
     procedure sbIlluminationPropagationChange(Sender: TObject);
@@ -221,9 +215,7 @@ type
     procedure Exit1Click(Sender: TObject);
     procedure miSaveAsClick(Sender: TObject);
     procedure miSaveClick(Sender: TObject);
-    procedure cbGraphicsLevelChange(Sender: TObject);
     procedure sbDiffuseTextureIdChange(Sender: TObject);
-    procedure cbDoubleSidedTrianglesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure miHiResScreenshotClick(Sender: TObject);
     procedure btnLoadTextureClick(Sender: TObject);
@@ -244,7 +236,6 @@ type
     procedure imgSpecularTextureClick(Sender: TObject);
     procedure imgReflectionTextureClick(Sender: TObject);
     procedure imgTransparencyTextureClick(Sender: TObject);
-    procedure sbAmbientLightIntensityChange(Sender: TObject);
     procedure sbOpacityChange(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure meReflectionExit(Sender: TObject);
@@ -269,6 +260,8 @@ type
     procedure miLowResScreenshotClick(Sender: TObject);
     procedure imgAmbientOcclusionTextureClick(Sender: TObject);
     procedure miAmbientOcclusionTextureClick(Sender: TObject);
+    procedure ResetRendering(Sender: TObject);
+    procedure miWebLinkClick(Sender: TObject);
   private
     { Private declarations }
     FPathTracingIteration : integer;
@@ -319,9 +312,6 @@ type
     previousMouseX : integer;
     previousMouseY : integer;
 
-    {postProcessing}
-    postProcessingParam : double;
-
   private
     {Models}
     currentModel : TModel;
@@ -371,6 +361,7 @@ uses
 {$endif}
   fAbout,
   Math,idHTTP,
+  Winapi.ShellAPI,
   System.UITypes,strUtils;
 
 {$R *.dfm}
@@ -670,7 +661,6 @@ begin
   previousMouseY := 0;
 
   FPathTracingIteration := 0;
-  postProcessingParam := 1000;
 
   initializeMaterials;
   updateMaterials;
@@ -689,13 +679,13 @@ begin
     if(cbPostProcessing.ItemIndex=integer(ppe_filters)) then
       param :=cbFilters.ItemIndex
     else
-      param := sbPPIntensity.Position;
+      param := sbPPParam2.Position;
 
     RayTracer_SetPostProcessingInfo(
       cbPostProcessing.itemIndex,
-      postProcessingParam,
-      sbPPIntensity.Position*50,
-      param);
+      sbPPParam1.Position*100,
+      param,
+      80);
 
     RayTracer_SetCamera(
       viewPos.x, viewPos.y, viewPos.z,
@@ -709,11 +699,6 @@ begin
     img3DView.Picture.Assign(F3DBitmap);
     img3DView.Refresh;
   end;
-end;
-
-procedure TmainForm.rgMiscClick(Sender: TObject);
-begin
-  RenderScene;
 end;
 
 procedure TmainForm.rgMouseControlsClick(Sender: TObject);
@@ -853,6 +838,11 @@ procedure TmainForm.miTransparentTextureClick(Sender: TObject);
 begin
   FCurrentMaterial.transparencyTextureId := FCurrentSelectedTextureId;
   updateMaterial;
+end;
+
+procedure TmainForm.miWebLinkClick(Sender: TObject);
+begin
+  ShellExecute(0, 'OPEN', PChar('http://www.molecular-visualization.com'), '', '', SW_SHOWNORMAL);
 end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
@@ -1010,7 +1000,7 @@ begin
       GetRValue( shBackgroundColor.Brush.Color)/255,
       GetGValue( shBackgroundColor.Brush.Color)/255,
       GetBValue( shBackgroundColor.Brush.Color)/255,
-      sbAmbientLightIntensity.Position/20,
+      sbAmbientLightIntensity.Position/100,
       integer(cbBoundingBoxes.checked),
       FPathTracingIteration,
       FMaxPathTracingIterations,
@@ -1075,11 +1065,6 @@ begin
   updateMaterial;
 end;
 
-procedure TmainForm.sbAmbientLightIntensityChange(Sender: TObject);
-begin
-   RenderScene;
-end;
-
 procedure TmainForm.sbCameraClick(Sender: TObject);
 begin
   Screen.Cursor := crDefault;
@@ -1137,36 +1122,6 @@ begin
   RenderScene;
 end;
 
-procedure TmainForm.sbShadowIntensityChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
-procedure TmainForm.sbRayInterationsChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
-procedure TmainForm.sbViewDistanceChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
-procedure TmainForm.cb3DVisionChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
-procedure TmainForm.sbWith3DVisionChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
-procedure TmainForm.cbBoundingBoxesClick(Sender: TObject);
-begin
-  RenderScene;
-end;
-
 procedure TmainForm.cbContinuousRenderingClick(Sender: TObject);
 begin
   FPathTracingIteration := 0;
@@ -1182,11 +1137,6 @@ begin
     FMaxPathTracingIterations := pbProcessing.Max;
     timer.Enabled := true;
   end;
-end;
-
-procedure TmainForm.cbDoubleSidedTrianglesClick(Sender: TObject);
-begin
-  RenderScene;
 end;
 
 procedure TmainForm.img3DViewMouseDown(Sender: TObject; Button: TMouseButton;
@@ -1215,7 +1165,7 @@ begin
       3: // Post processing effetcs
       begin
         RayTracer_GetPrimitiveCenter(FCurrentPrimitive, center.x, center.y, center.z);
-        postProcessingParam := center.z-viewPos.z;
+        sbPPParam1.Position := trunc(center.z-viewPos.z);
         FPathTracingIteration := 0;
       end;
     end;
@@ -1284,7 +1234,7 @@ begin
             end;
             3: // post processing
             begin
-              postProcessingParam := postProcessingParam + 20*( my - previousMouseY );
+              sbPPParam2.Position := sbPPParam2.Position + ( my - previousMouseY );
             end;
 
           end;
@@ -1475,6 +1425,7 @@ begin
         filename := StringReplace(string(currentModel.filename),extension,'.obj',[rfReplaceAll, rfIgnoreCase]);
         memLogs.Lines.Add('Loading ' + filename + '...' );
         RayTracer_LoadOBJModel(AnsiString(filename),20,1,5000,1,groundHeight);
+        groundHeight := groundHeight*5000;
         cbExtendedGeometry.Checked := true;
       end;
     mtOBJ:
@@ -1734,8 +1685,9 @@ begin
   updateWorld;
 end;
 
-procedure TmainForm.cbGraphicsLevelChange(Sender: TObject);
+procedure TmainForm.ResetRendering(Sender: TObject);
 begin
+  FPathTracingIteration := 0;
   RenderScene;
 end;
 
@@ -1908,16 +1860,6 @@ begin
   FControlUpdate := false;
 end;
     
-procedure TmainForm.sbPPIntensityChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
-procedure TmainForm.cbPostProcessingChange(Sender: TObject);
-begin
-  RenderScene;
-end;
-
 procedure TmainForm.pnlCenterMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin

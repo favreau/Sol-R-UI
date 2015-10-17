@@ -507,7 +507,7 @@ object frmAbout: TfrmAbout
     Left = 302
     Top = 53
     Width = 217
-    Height = 108
+    Height = 91
     Alignment = taCenter
     Caption = 
       'WARNING: This computer program is protected by copyright law and' +
@@ -535,7 +535,7 @@ object frmAbout: TfrmAbout
   object Label2: TLabel
     Left = 376
     Top = 174
-    Width = 57
+    Width = 46
     Height = 13
     Alignment = taCenter
     Caption = 'About me'

@@ -1,5 +1,5 @@
 {
-Copyright (c) 2011-2015, Cyrille Favreau
+Copyright (c) 2011-2017, Cyrille Favreau
 All rights reserved. Do not distribute without permission.
 Responsible Author: Cyrille Favreau <cyrille_favreau@hotmail.com>
 
@@ -53,57 +53,50 @@ implementation
 {$R *.dfm}
 
 uses
-  RayTracingEngineStub;
+  SolRStub;
 
 procedure TfrmOpenCLSettings.cbPlatformsChange(Sender: TObject);
-{$ifndef CUDA}
 var
   devices  : integer;
   value    : PAnsiChar;
   p,d      : Integer;
-{$endif}
 begin
-{$ifndef CUDA}
   p := cbPlatforms.ItemIndex;
   cbDevices.Items.Clear;
   value := AllocMem(100);
-  RayTracer_GetOpenCLPlatformDescription(p,value,100);
-  devices := RayTracer_GetOpenCLDeviceCount(p);
+  SolR_GetOpenCLPlatformDescription(p,value,100);
+  devices := SolR_GetOpenCLDeviceCount(p);
   for d := 0 to devices-1 do
   begin
-    RayTracer_GetOpenCLDeviceDescription(p,d,value,100);
+    SolR_GetOpenCLDeviceDescription(p,d,value,100);
     cbDevices.Items.Add(TrimLeft(string(value)));
   end;
   FreeMem(value);
   cbDevices.ItemIndex := 0;
-{$endif}
 end;
 
 procedure TfrmOpenCLSettings.FormCreate(Sender: TObject);
-{$ifndef CUDA}
 var
   platforms: integer;
   devices  : integer;
   v        : PAnsiChar;
   p,d      : Integer;
-{$endif}
 begin
-{$ifndef CUDA}
-  RayTracer_PopulateOpenCLInformation;
+  SolR_PopulateOpenCLInformation;
   cbPlatforms.Items.Clear;
   cbDevices.Items.Clear;
   v := AllocMem(100);
-  platforms := RayTracer_GetOpenCLPlaformCount;
+  platforms := SolR_GetOpenCLPlaformCount;
   for p := 0 to platforms-1 do
   begin
-    RayTracer_GetOpenCLPlatformDescription(p,v,100);
+    SolR_GetOpenCLPlatformDescription(p,v,100);
     cbPlatforms.Items.add(string(v));
     if p=0 then
     begin
-      devices := RayTracer_GetOpenCLDeviceCount(p);
+      devices := SolR_GetOpenCLDeviceCount(p);
       for d := 0 to devices-1 do
       begin
-        RayTracer_GetOpenCLDeviceDescription(p,d,v,100);
+        SolR_GetOpenCLDeviceDescription(p,d,v,100);
         cbDevices.Items.Add(TrimLeft(string(v)));
       end;
     end;
@@ -111,7 +104,6 @@ begin
   FreeMem(v);
   cbPlatforms.ItemIndex := 0;
   cbDevices.ItemIndex := 0;
-{$endif}
 end;
 
 end.

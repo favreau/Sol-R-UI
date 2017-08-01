@@ -1,5 +1,5 @@
 {
-Copyright (c) 2011-2015, Cyrille Favreau
+Copyright (c) 2011-2017, Cyrille Favreau
 All rights reserved. Do not distribute without permission.
 Responsible Author: Cyrille Favreau <cyrille_favreau@hotmail.com>
 
@@ -33,7 +33,6 @@ type
     imgSolR: TImage;
     btnOk: TButton;
     miWebLink: TLabel;
-    Label1: TLabel;
     Label2: TLabel;
     procedure miWebLinkClick(Sender: TObject);
     procedure imgSolRClick(Sender: TObject);
@@ -72,7 +71,7 @@ end;
 
 procedure TfrmAbout.miWebLinkClick(Sender: TObject);
 begin
-  ShellExecute(0, 'OPEN', PChar('http://www.molecular-visualization.com'), '', '', SW_SHOWNORMAL);
+  ShellExecute(0, 'OPEN', PChar('http://cudaopencl.blogspot.com'), '', '', SW_SHOWNORMAL);
 end;
 
 end.

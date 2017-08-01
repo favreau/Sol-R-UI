@@ -1,5 +1,5 @@
 {
-Copyright (c) 2011-2015, Cyrille Favreau
+Copyright (c) 2011-2017, Cyrille Favreau
 All rights reserved. Do not distribute without permission.
 Responsible Author: Cyrille Favreau <cyrille_favreau@hotmail.com>
 
@@ -25,11 +25,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, RayTRacingEngineStub, ComCtrls, jpeg,
+  Dialogs, StdCtrls, ExtCtrls, SolRStub, ComCtrls, jpeg,
   VCLTee.TeCanvas, Vcl.ColorGrd, Vcl.Ribbon, Vcl.RibbonLunaStyleActnCtrls,
   Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnList, Vcl.Mask, Vcl.Samples.Spin, Vcl.ActnColorMaps,
-  Vcl.Buttons, Vcl.Menus, Vcl.ImgList, Vcl.Grids, Vcl.ButtonGroup;
+  Vcl.Buttons, Vcl.Menus, Vcl.ImgList, Vcl.Grids, Vcl.ButtonGroup,
+  Vcl.Imaging.pngimage;
 
 type
   TModelType = ( mtNone = 0, mtPDB = 1, mtOBJ = 2, mtIRT );
@@ -75,15 +76,15 @@ type
     sbShadowIntensity: TScrollBar;
     cbGraphicsLevel: TComboBox;
     gbPostProcessing: TGroupBox;
-    Label16: TLabel;
-    Label17: TLabel;
+    lblPostProcessingType: TLabel;
+    lblPostProcessingParam1: TLabel;
     cbPostProcessing: TComboBox;
     sbPPParam1: TScrollBar;
     rgMisc: TRadioGroup;
     gbEnvironment: TGroupBox;
     shBackgroundColor: TShape;
-    Label14: TLabel;
-    Label15: TLabel;
+    lblBackground: TLabel;
+    lblContainers: TLabel;
     cbScene: TComboBox;
     gbHelpers: TGroupBox;
     cbBoundingBoxes: TCheckBox;
@@ -92,10 +93,10 @@ type
     shMaterialColor: TShape;
     Button2: TButton;
     gbBasicParameters: TGroupBox;
-    Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
-    Label10: TLabel;
+    lblReflection: TLabel;
+    lblTransparency: TLabel;
+    lblRefraction: TLabel;
+    lblNoise: TLabel;
     cbProcedural: TCheckBox;
     sbReflection: TScrollBar;
     sbTransparency: TScrollBar;
@@ -146,11 +147,11 @@ type
     cbRepresentation: TComboBox;
     cbTheme: TComboBox;
     gbOnlinePDB: TGroupBox;
-    Label18: TLabel;
+    lblMolecule: TLabel;
     btnOpen: TButton;
     edtMoleculeId: TMaskEdit;
     sbAmbientLightIntensity: TScrollBar;
-    Label11: TLabel;
+    lblOpacity: TLabel;
     sbOpacity: TScrollBar;
     miHelp: TMenuItem;
     miAbout: TMenuItem;
@@ -186,10 +187,14 @@ type
     miAmbientOcclusionTexture: TMenuItem;
     cbGlobalIllumination: TComboBox;
     cbFilters: TComboBox;
-    Label12: TLabel;
+    lblPostProcessingFilter: TLabel;
     sbPPParam2: TScrollBar;
-    Label13: TLabel;
-    miWebLink: TLabel;
+    lblPostProcessingParam2: TLabel;
+    gbEpsilons: TGroupBox;
+    sbGeometryEpsilon: TScrollBar;
+    sbRayEpsilon: TScrollBar;
+    lblEpsilonGeometry: TLabel;
+    lblEpsilonRay: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -360,11 +365,9 @@ type
     FMaxPathTracingIterations: integer;
     SceneInitialized : boolean;
 
-{$ifndef CUDA}
   private
     FOCLPlatform : integer;
     FOCLDevice   : integer;
-{$endif}
 
   private
     {Folders}
@@ -377,9 +380,7 @@ var
 implementation
 
 uses
-{$ifndef CUDA}
   fOpenCLSettings,
-{$endif}
   fAbout,
   Math,idHTTP,
   Winapi.ShellAPI,
@@ -402,12 +403,12 @@ var
   status : integer;
   filename: string;
 begin
-  n := RayTracer_GetNbTextures;
+  n := SolR_GetNbTextures;
   i := 0;
   if FindFirst(ApplicationFolder+folder+'\' + filter, faAnyFile, SR) = 0 then
   repeat
     filename := ApplicationFolder+folder+'\'+SR.Name;
-    status := RayTracer_LoadTextureFromFile( n+i, AnsiString(filename) );
+    status := SolR_LoadTextureFromFile( n+i, AnsiString(filename) );
     if( status=-1 ) then
       memLogs.Lines.Add('Failed to load ' + filename);
     inc(i);
@@ -428,11 +429,11 @@ begin
   loadTextures(texFolder, '*.jpg');
   loadTextures(texFolder, '*.tga');
 
-  i := RayTracer_GetNbTextures;
+  i := SolR_GetNbTextures;
   memLogs.Lines.Add( IntToStr(i) + ' textures loaded');
 
   for i := 0 to NB_MAX_MATERIALS-1 do
-    RayTracer_AddMaterial;
+    SolR_AddMaterial;
 end;
 
 procedure TmainForm.Open1Click(Sender: TObject);
@@ -614,7 +615,7 @@ begin
       DEFAULT_LIGHT_MATERIAL: begin r:=1; g:=1; b:=1; innerIllumination:=2; end;
     end;
 
-    RayTracer_SetMaterial(
+    SolR_SetMaterial(
       i,
       r,g,b,
       noise,
@@ -650,17 +651,13 @@ begin
 
   if( not FKernelInitialized ) then
   begin
-      RayTracer_SetDraftMode(0);
+      SolR_SetDraftMode(0);
 
       updateScene;
-  {$ifdef CUDA}
-      RayTracer_InitializeKernel(false,0,0);
-  {$else}
-      RayTracer_InitializeKernel(false,FOCLPlatform,FOCLDevice);
-  {$endif}
+      SolR_InitializeKernel(false,FOCLPlatform,FOCLDevice);
       FKernelInitialized := true;
   end;
-  RayTracer_ResetKernel();
+  SolR_ResetKernel();
 
   previousSelectedPrimitive := -1;
   previousSelectedMaterial  := -1;
@@ -702,20 +699,20 @@ begin
     else
       param := sbPPParam2.Position;
 
-    RayTracer_SetPostProcessingInfo(
+    SolR_SetPostProcessingInfo(
       cbPostProcessing.itemIndex,
       sbPPParam1.Position*100,
       param,
       80);
 
-    RayTracer_SetCamera(
+    SolR_SetCamera(
       viewPos.x, viewPos.y, viewPos.z,
       viewDir.x, viewDir.y, viewDir.z,
       viewAngles.x, viewAngles.y, viewAngles.z );
 
     updateScene;
 
-    RayTracer_RunKernel(0,F3DBitmap.ScanLine[img3DView.Height-1]);
+    SolR_RunKernel(0,F3DBitmap.ScanLine[img3DView.Height-1]);
 
     img3DView.Picture.Assign(F3DBitmap);
     img3DView.Refresh;
@@ -823,7 +820,7 @@ begin
   sdSaveFile.Filter := 'SoL-R File|*.irt';
   if sdSaveFile.Execute then
   begin
-    RayTracer_SaveToFile( AnsiString(sdSaveFile.FileName) );
+    SolR_SaveToFile( AnsiString(sdSaveFile.FileName) );
     currentModel.modelType := mtIRT;
     currentModel.Filename := AnsiString(sdSaveFile.FileName);
   end;
@@ -834,7 +831,7 @@ begin
   if currentModel.modelType <> mtIRT then
     miSaveAsClick(sender)
   else
-    RayTracer_SaveToFile(currentModel.Filename);
+    SolR_SaveToFile(currentModel.Filename);
 end;
 
 procedure TmainForm.miHiResScreenshotClick(Sender: TObject);
@@ -842,7 +839,7 @@ begin
   sdSaveFile.Filter:='JPEG|*.jpg';
   if sdSaveFile.Execute then
   begin
-    RayTracer_GenerateScreenshot(AnsiString(sdSaveFile.FileName),1);
+    SolR_GenerateScreenshot(AnsiString(sdSaveFile.FileName),1);
   end;
 end;
 
@@ -863,7 +860,7 @@ end;
 
 procedure TmainForm.miWebLinkClick(Sender: TObject);
 begin
-  ShellExecute(0, 'OPEN', PChar('http://www.molecular-visualization.com'), '', '', SW_SHOWNORMAL);
+  ShellExecute(0, 'OPEN', PChar('http://cudaopencl.blogspot.com'), '', '', SW_SHOWNORMAL);
 end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
@@ -871,23 +868,23 @@ var
   i: integer;
   str, key, value, fileExtension: string;
   position: integer;
-{$ifndef CUDA}
   fOCLSettings: TfrmOpenCLSettings;
-{$endif}
 begin
-{$ifndef CUDA}
-  FOCLPlatform := 0;
-  FOCLDevice := 0;
-  fOCLSettings := TfrmOpenCLSettings.Create(self);
-  if fOCLSettings.ShowModal=mrOk then
+  if SolR_GetOpenCLPlaformCount() <> 0 then
   begin
-    FOCLPlatform := fOCLSettings.cbPlatforms.ItemIndex;
-    FOCLDevice := fOCLSettings.cbDevices.ItemIndex;
-  end;
-  fOCLSettings.Free;
-{$else}
-  btnRecompileKernels.Visible := false;
-{$endif CUDA}
+    FOCLPlatform := 0;
+    FOCLDevice := 0;
+    fOCLSettings := TfrmOpenCLSettings.Create(self);
+    if fOCLSettings.ShowModal=mrOk then
+    begin
+      FOCLPlatform := fOCLSettings.cbPlatforms.ItemIndex;
+      FOCLDevice := fOCLSettings.cbDevices.ItemIndex;
+    end;
+    fOCLSettings.Free;
+    btnRecompileKernels.Visible := true;
+  end
+  else
+    btnRecompileKernels.Visible := false;
 
   FKernelInitialized := false;
   ApplicationFolder := ExtractFileDir(Application.ExeName) + '\';
@@ -943,7 +940,7 @@ end;
 
 procedure TmainForm.FormDestroy(Sender: TObject);
 begin
- RayTracer_FinalizeKernel;
+ SolR_FinalizeKernel;
 end;
 
 procedure TmainForm.tbReflectionChange(Sender: TObject);
@@ -978,7 +975,7 @@ begin
     FCurrentMaterial.fastTransparency:=fastTransparency;
 
     memLogs.Lines.Add('Set Transparency id:' + IntToStr(FCurrentMaterial.transparencyTextureId));
-    RayTracer_SetMaterial(
+    SolR_SetMaterial(
       FCurrentMaterialId,
       FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
       FCurrentMaterial.noise,
@@ -1008,7 +1005,7 @@ procedure TmainForm.updateScene;
 begin
   if( not FControlUpdate ) then
   begin
-    RayTracer_SetSceneInfo(
+    SolR_SetSceneInfo(
       img3DView.Width,
       img3DView.Height,
       cbGraphicsLevel.ItemIndex,
@@ -1032,7 +1029,8 @@ begin
       integer(cbDoubleSidedTriangles.Checked),
       integer(cbExtendedGeometry.Checked),
       cbGlobalIllumination.ItemIndex,
-      sbViewDistance.Position*450,SKYBOX_SPHERE_MATERIAL);
+      sbViewDistance.Position*450,SKYBOX_SPHERE_MATERIAL,
+      sbGeometryEpsilon.Position/1000,sbRayEpsilon.Position/1000);
   end;
 end;
 
@@ -1172,20 +1170,20 @@ begin
   previousMouseY := (Y-img3DView.Height div 2);
 
   if(cbDraftMode.Checked) then
-    RayTracer_SetDraftMode(1);
+    SolR_SetDraftMode(1);
 
   if( FCurrentPrimitive<>PRIMITIVE_NONE ) and ( Button = mbLeft ) then
   begin
     case rgMouseControls.ItemIndex of
       1: // Molecule
       begin
-        FCurrentMaterialId := RayTracer_GetPrimitiveMaterial(FCurrentPrimitive);
+        FCurrentMaterialId := SolR_GetPrimitiveMaterial(FCurrentPrimitive);
         updateMaterialControls;
         FPathTracingIteration := 0;
       end;
       3: // Post processing effetcs
       begin
-        RayTracer_GetPrimitiveCenter(FCurrentPrimitive, center.x, center.y, center.z);
+        SolR_GetPrimitiveCenter(FCurrentPrimitive, center.x, center.y, center.z);
         sbPPParam1.Position := trunc(center.z-viewPos.z);
         FPathTracingIteration := 0;
       end;
@@ -1204,7 +1202,7 @@ var
 begin
   if FKernelInitialized then
   begin
-    FCurrentPrimitive := RayTracer_GetPrimitiveAt(img3DView.Width-x,img3DView.Height-y);
+    FCurrentPrimitive := SolR_GetPrimitiveAt(img3DView.Width-x,img3DView.Height-y);
     lblPrimitiveID.Caption := 'Primitive ID: ' + IntToStr(FCurrentPrimitive);
   end;
 
@@ -1216,7 +1214,7 @@ begin
     begin
       FPathTracingIteration := 0;
       case mouseButton of
-        mbLeft:
+        mbRight:
         begin
           case rgMouseControls.ItemIndex of
             0..1: // Camera
@@ -1243,15 +1241,15 @@ begin
             begin
               lampPos.x := lampPos.x + 50*( mx - previousMouseX );
               lampPos.y := lampPos.y - 50*( my - previousMouseY );
-              lamp := RayTracer_GetLight(0);
-              RayTracer_SetPrimitive(
+              lamp := SolR_GetLight(0);
+              SolR_SetPrimitive(
                 lamp,
                 lampPos.x, lampPos.y, lampPos.z,
                 0, 0, 0,
                 0, 0, 0,
                 lampSize, 0, 0,
                 DEFAULT_LIGHT_MATERIAL);
-              RayTracer_CompactBoxes(false);
+              SolR_CompactBoxes(false);
             end;
             3: // post processing
             begin
@@ -1260,7 +1258,7 @@ begin
 
           end;
         end;
-        mbRight:
+        mbLeft:
         begin
           case rgMouseControls.ItemIndex of
             0..1:
@@ -1270,21 +1268,21 @@ begin
                 viewAngles.y :=  viewAngles.y - ArcSin(value);
               value := (previousMouseY - my)/100;
               if abs(value)<1 then
-                viewAngles.x :=  viewAngles.x + ArcSin(value);
+                viewAngles.x :=  viewAngles.x - ArcSin(value);
             end;
             2: // light source
             begin
               lampPos.x := lampPos.x + 50*( mx - previousMouseX );
               lampPos.z := lampPos.z - 50*( my - previousMouseY );
-              lamp := RayTracer_GetLight(0);
-              RayTracer_SetPrimitive(
+              lamp := SolR_GetLight(0);
+              SolR_SetPrimitive(
                 lamp,
                 lampPos.x, lampPos.y, lampPos.z,
                 0, 0, 0,
                 0, 0, 0,
                 lampSize, 0, 0,
                 DEFAULT_LIGHT_MATERIAL);
-              RayTracer_CompactBoxes(false);
+              SolR_CompactBoxes(false);
             end;
           end;
         end;
@@ -1302,7 +1300,7 @@ begin
               if abs(value)<1 then
                 viewAngles.x :=  viewAngles.x + ArcSin(value);
               angles.z := 0;
-              RayTracer_RotatePrimitives( 0, nbPrimitives, 0,0,0, angles.x, angles.y, angles.z );
+              SolR_RotatePrimitives( 0, nbPrimitives, 0,0,0, angles.x, angles.y, angles.z );
             end;
           end;
         end;
@@ -1322,7 +1320,7 @@ begin
   if( FCurrentMaterialId<>MATERIAL_NONE ) then
   begin
     // Selection
-    RayTracer_GetMaterial(
+    SolR_GetMaterial(
       FCurrentMaterialId,
       FCurrentMaterial.color.x,FCurrentMaterial.color.y,FCurrentMaterial.color.z,
       FCurrentMaterial.noise, FCurrentMaterial.reflection, FCurrentMaterial.refraction,
@@ -1358,7 +1356,7 @@ procedure TmainForm.img3DViewMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   if(cbDraftMode.Checked) then
   begin
-    RayTracer_SetDraftMode(0);
+    SolR_SetDraftMode(0);
     RenderScene;
   end;
   mouseDown := false;
@@ -1435,7 +1433,7 @@ begin
     mtPDB:
       begin
         memLogs.Lines.Add('Loading ' + string(currentModel.Filename) + '...' );
-        nbPrimitives := RayTracer_LoadMolecule(
+        nbPrimitives := SolR_LoadMolecule(
           currentModel.Filename,
           TGeometryType( cbGeometryType.ItemIndex ),
           sbDefaultAtomSize.Position,
@@ -1445,20 +1443,21 @@ begin
         extension := ExtractFileExt(string(currentModel.filename));
         filename := StringReplace(string(currentModel.filename),extension,'.obj',[rfReplaceAll, rfIgnoreCase]);
         memLogs.Lines.Add('Loading ' + filename + '...' );
-        RayTracer_LoadOBJModel(AnsiString(filename),20,1,5000,1,groundHeight);
+        SolR_LoadOBJModel(AnsiString(filename),20,1,5000,1,groundHeight);
         groundHeight := groundHeight*5000;
         cbExtendedGeometry.Checked := true;
       end;
     mtOBJ:
-      RayTracer_LoadOBJModel(currentModel.Filename,0,1,5000,1,groundHeight);
+      SolR_LoadOBJModel(currentModel.Filename,0,1,5000,1,groundHeight);
     mtIRT:
-      RayTracer_LoadFromFile(currentModel.Filename,5000 );
+      SolR_LoadFromFile(currentModel.Filename,5000 );
   end;
   updateTextureControls;
+  groundHeight := groundHeight * 1.001;
 
   // Light
-  lamp := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
-  RayTracer_SetPrimitive(
+  lamp := SolR_AddPrimitive(integer(ptSphere), integer(false));
+  SolR_SetPrimitive(
     lamp,
     lampPos.x, lampPos.y, lampPos.z,
     0, 0, 0,
@@ -1472,114 +1471,114 @@ begin
     0: ;// nothing
     1: // Ground
     begin
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
     end;
     2: // Skymap
     begin
-      primitiveId := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
-      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptSphere), integer(false));
+      SolR_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
     end;
     3: // Skymap and Ground
     begin
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptSphere), integer(false));
-      RayTracer_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptSphere), integer(false));
+      SolR_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
     end;
     4: // Cornell Box
     begin
       boxSize := 10000;
       // Ground
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
 
       groundHeight := groundHeight+boxSize;
       // Front
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
 
       // Right
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
 
       {
       // Back
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle));
+      SolR_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle));
+      SolR_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
       }
 
       // Left
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
 
       // Top
       // Ground
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
 
-      primitiveId := RayTracer_AddPrimitive(integer(ptTriangle), integer(false));
-      RayTracer_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
-      RayTracer_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
-      RayTracer_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
+      SolR_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
+      SolR_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
     end;
   end;
 
-  nbPrimitives := RayTracer_CompactBoxes(true);
+  nbPrimitives := SolR_CompactBoxes(true);
 
   memLogs.Lines.Add( 'Current model: ' + String(currentModel.Filename));
 
@@ -1624,8 +1623,8 @@ begin
   begin
     for i := 0 to odImage.Files.Count-1 do
     begin
-      n := RayTracer_GetNbTextures;
-      RayTracer_LoadTextureFromFile(n,AnsiString(odImage.Files[i]));
+      n := SolR_GetNbTextures;
+      SolR_LoadTextureFromFile(n,AnsiString(odImage.Files[i]));
       memLogs.Lines.Add(odImage.FileName + ' loaded');
     end;
     updateTextureControls;
@@ -1637,7 +1636,7 @@ procedure TmainForm.btnLoadTextureClick(Sender: TObject);
 begin
   if odImage.Execute then
   begin
-    RayTracer_LoadTextureFromFile(0,AnsiString(odImage.FileName));
+    SolR_LoadTextureFromFile(0,AnsiString(odImage.FileName));
   end;
 end;
 
@@ -1681,9 +1680,7 @@ end;
 
 procedure TmainForm.btnRecompileKernelsClick(Sender: TObject);
 begin
-{$ifndef CUDA}
-  RayTracer_RecompileKernels('E:/svn/GPGPU/CUDA/RaytracingEngine/trunk/OpenCL/RayTracer.cl');
-{$endif CUDA}
+  SolR_RecompileKernels('RayTracer.cl');
 end;
 
 procedure TmainForm.cbFastTransparencyClick(Sender: TObject);
@@ -1735,12 +1732,12 @@ var
 begin
   if FKernelInitialized then
   begin
-     n := RayTracer_GetNbTextures;
+     n := SolR_GetNbTextures;
      index := ARow*dgTextures.ColCount+ACol-1;
 
      if (index>=0) and (index<n) then
      begin
-       if RayTracer_GetTextureSize(index,width,height,depth)=0 then
+       if SolR_GetTextureSize(index,width,height,depth)=0 then
        begin
          FTexturePreview.Free;
          FTexturePreview := TBitmap.Create;
@@ -1752,7 +1749,7 @@ begin
            FTexturePreview.PixelFormat := pf32bit;
          end;
 
-         RayTracer_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
+         SolR_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
          dgTextures.Canvas.StretchDraw(Rect,FTexturePreview);
        end;
      end;
@@ -1764,7 +1761,7 @@ procedure TmainForm.dgTexturesSelectCell(Sender: TObject; ACol, ARow: Integer;
 var
   index,n: integer;
 begin
-  n := RayTracer_GetNbTextures;
+  n := SolR_GetNbTextures;
   index := ARow*dgTextures.ColCount+ACol-1;
   if index<n then
   begin
@@ -1897,7 +1894,7 @@ begin
   end
   else
   begin
-    RayTracer_GetTextureSize(index,width,height,depth);
+    SolR_GetTextureSize(index,width,height,depth);
     FTexturePreview.Free;
     FTexturePreview := TBitmap.Create;
     FTexturePreview.Width  := width;
@@ -1908,7 +1905,7 @@ begin
       FTexturePreview.PixelFormat := pf32bit;
     end;
 
-    RayTracer_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
+    SolR_GetTexture(index,FTexturePreview.ScanLine[FTexturePreview.Height-1]);
     image.Picture.Bitmap.Assign(FTexturePreview);
   end;
   image.Refresh;
@@ -1918,7 +1915,7 @@ procedure TmainForm.updateTextureControls;
 var
   n : integer;
 begin
-  n := RayTracer_GetNbTextures;
+  n := SolR_GetNbTextures;
   dgTextures.RowCount := (n div dgTextures.ColCount)+1;
   dgTextures.Refresh;
 end;

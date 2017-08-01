@@ -10,3 +10,10 @@ generated
 *.creator*
 *.user
 __history
+bin/
+dcu/
+*.local
+*.identcache
+*.dres
+*.res
+*.rc

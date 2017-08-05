@@ -64,10 +64,8 @@ type
     pgParameters: TPageControl;
     tsScene: TTabSheet;
     gb3DVision: TGroupBox;
-    lbl3DVisionType: TLabel;
-    lbl3DVisionStrength: TLabel;
-    cb3DVision: TComboBox;
-    sbWith3DVision: TScrollBar;
+    lbl3DVisionSeparation: TLabel;
+    sbEyeSeparation: TScrollBar;
     gbShadows: TGroupBox;
     lblRayIterations: TLabel;
     lblViewDistance: TLabel;
@@ -80,7 +78,6 @@ type
     lblPostProcessingParam1: TLabel;
     cbPostProcessing: TComboBox;
     sbPPParam1: TScrollBar;
-    rgMisc: TRadioGroup;
     gbEnvironment: TGroupBox;
     shBackgroundColor: TShape;
     lblBackground: TLabel;
@@ -195,6 +192,7 @@ type
     sbRayEpsilon: TScrollBar;
     lblEpsilonGeometry: TLabel;
     lblEpsilonRay: TLabel;
+    rgCameraType: TRadioGroup;
     procedure FormDestroy(Sender: TObject);
     procedure tbReflectionChange(Sender: TObject);
     procedure tbRefractionChange(Sender: TObject);
@@ -1013,8 +1011,7 @@ begin
       0,     // transparent Color
       sbViewDistance.Position*500,
       sbShadowIntensity.Position/100,
-      cb3DVision.ItemIndex,
-      sbWith3DVision.Position*5,
+      sbEyeSeparation.Position*5,
       GetRValue( shBackgroundColor.Brush.Color)/255,
       GetGValue( shBackgroundColor.Brush.Color)/255,
       GetBValue( shBackgroundColor.Brush.Color)/255,
@@ -1022,10 +1019,10 @@ begin
       integer(cbBoundingBoxes.checked),
       FPathTracingIteration,
       FMaxPathTracingIterations,
-      integer(ot_Delphi),
+      integer(fb_BGR),
       random(1000),
       0,
-      rgMisc.ItemIndex,
+      rgCameraType.ItemIndex,
       integer(cbDoubleSidedTriangles.Checked),
       integer(cbExtendedGeometry.Checked),
       cbGlobalIllumination.ItemIndex,

@@ -104,10 +104,9 @@ Type
     ppe_radiosity        = 3,
     ppe_filters          = 4 );
 
-  TOutputType = (
-    ot_OpenGL = 0,
-    ot_Delphi = 1,
-    ot_JPEG   = 2 );
+  TFrameBufferType = (
+    fb_RGB = 0,
+    fb_BGR = 1 );
 
   TGeometryType = (
    gtAtoms           = 0,
@@ -167,22 +166,13 @@ Function SolR_RecompileKernels(
   filename: PAnsiChar) : Integer; cdecl; external SOLR_DLL;
 
 Function SolR_SetSceneInfo(
-   width,height : Integer;
-   graphicsLevel : integer;
-   nbRayIterations : integer;
-   transparentColor,
-   viewDistance,
-   shadowIntensity : Double;
-   supportFor3DVision : integer;
-   width3DVision : Double;
+   width, height, graphicsLevel, nbRayIterations : integer;
+   transparentColor, viewDistance, shadowIntensity : Double;
+   eyeSeparation : Double;
    bgColorR, bgColorG, bgColorB, bgColorA : Double;
-   renderBoxes : Integer;
-   pathTracingIteration,
-   maxPathTracingIterations : Integer;
-   outputType: integer;
-   timer: integer; fogEffect: integer; isometric3D: integer;
-   doubleSidedTriangles, gradientBackGround, globalIllumination: integer;
-   sbyboxSize, skyboxMaterialId: integer;
+   renderBoxes, pathTracingIteration, maxPathTracingIterations, frameBufferType,
+   timestamp, atmosphericEffect, cameraType, oubleSidedTriangles,
+   extendedGeometry, advancedIllumination, sbyboxSize, skyboxMaterialId: integer;
    geometryEpsilon, rayEpsilon: Double ) : Integer; cdecl; external SOLR_DLL;
 
 Function SolR_SetPostProcessingInfo(

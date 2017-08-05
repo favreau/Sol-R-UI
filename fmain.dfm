@@ -14301,51 +14301,26 @@ object mainForm: TmainForm
           Left = 3
           Top = 325
           Width = 258
-          Height = 73
+          Height = 44
           Align = alTop
           Caption = '3D Vision'
           TabOrder = 3
-          Visible = False
-          object lbl3DVisionType: TLabel
-            Left = 9
-            Top = 21
-            Width = 27
-            Height = 13
-            Caption = 'Type:'
-          end
-          object lbl3DVisionStrength: TLabel
+          object lbl3DVisionSeparation: TLabel
             Left = 7
-            Top = 46
-            Width = 43
+            Top = 21
+            Width = 54
             Height = 13
-            Caption = 'Strength:'
+            Caption = 'Separation:'
           end
-          object cb3DVision: TComboBox
+          object sbEyeSeparation: TScrollBar
             Left = 88
-            Top = 16
-            Width = 156
-            Height = 21
-            Style = csDropDownList
-            ItemIndex = 0
-            TabOrder = 0
-            Text = '<none>'
-            OnChange = ResetRendering
-            Items.Strings = (
-              '<none>'
-              'Anaglyph 3D'
-              '3D Vision (Oculus VR)'
-              'Fish Eye'
-              'Volume Rendering')
-          end
-          object sbWith3DVision: TScrollBar
-            Left = 88
-            Top = 43
+            Top = 18
             Width = 156
             Height = 17
             Ctl3D = True
             PageSize = 0
             ParentCtl3D = False
-            TabOrder = 1
+            TabOrder = 0
             OnChange = ResetRendering
           end
         end
@@ -14516,25 +14491,6 @@ object mainForm: TmainForm
             OnChange = ResetRendering
           end
         end
-        object rgMisc: TRadioGroup
-          Left = 0
-          Top = 553
-          Width = 264
-          Height = 84
-          Margins.Left = 2
-          Margins.Top = 2
-          Margins.Right = 2
-          Margins.Bottom = 2
-          Align = alTop
-          Caption = 'Misc'
-          ItemIndex = 0
-          Items.Strings = (
-            'Perspective'
-            'Isometric 3D'
-            'Antialiasing')
-          TabOrder = 4
-          OnClick = ResetRendering
-        end
         object gbEnvironment: TGroupBox
           Left = 0
           Top = 0
@@ -14606,12 +14562,13 @@ object mainForm: TmainForm
         object gbHelpers: TGroupBox
           AlignWithMargins = True
           Left = 3
-          Top = 404
+          Top = 375
           Width = 258
           Height = 146
           Align = alTop
           Caption = 'Helpers'
-          TabOrder = 5
+          TabOrder = 4
+          ExplicitTop = 404
           object cbBoundingBoxes: TCheckBox
             Left = 9
             Top = 24
@@ -14667,12 +14624,14 @@ object mainForm: TmainForm
         end
         object gbEpsilons: TGroupBox
           Left = 0
-          Top = 637
+          Top = 608
           Width = 264
-          Height = 70
+          Height = 99
           Align = alClient
           Caption = 'Epsilons'
-          TabOrder = 6
+          TabOrder = 5
+          ExplicitTop = 637
+          ExplicitHeight = 70
           object lblEpsilonGeometry: TLabel
             Left = 12
             Top = 24
@@ -14711,6 +14670,29 @@ object mainForm: TmainForm
             TabOrder = 1
             OnChange = ResetRendering
           end
+        end
+        object rgCameraType: TRadioGroup
+          Left = 0
+          Top = 524
+          Width = 264
+          Height = 84
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
+          Align = alTop
+          Caption = 'Camera type'
+          Columns = 2
+          ItemIndex = 0
+          Items.Strings = (
+            'Perspective'
+            'Orthographic'
+            'Anaglyph 3D'
+            'Virtual Reality'
+            'Panoramic 360')
+          TabOrder = 6
+          OnClick = ResetRendering
+          ExplicitTop = 553
         end
       end
       object tsMaterial: TTabSheet

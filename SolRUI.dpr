@@ -53,6 +53,7 @@ begin
   end;
   Set8087CW($133f);
   Application.Initialize;
+  TStyleManager.TrySetStyle('Amakrits');
   Application.Title := 'SoL-R Editor';
   Application.CreateForm(TmainForm, mainForm);
   Application.CreateForm(TfrmAbout, frmAbout);

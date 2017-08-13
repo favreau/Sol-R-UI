@@ -249,9 +249,9 @@ Function SolR_SetPrimitiveNormals(
 
 Function SolR_SetPrimitiveTextureCoordinates(
    index : integer;
-   t0_x, t0_y, t0_z : double;
-   t1_x, t1_y, t1_z : double;
-   t2_x, t2_y, t2_z : double) : Integer; cdecl; external SOLR_DLL;
+   t0_x, t0_y: double;
+   t1_x, t1_y: double;
+   t2_x, t2_y: double) : Integer; cdecl; external SOLR_DLL;
 
 // ---------- Materials ----------
 Function SolR_AddMaterial : Integer; cdecl; external SOLR_DLL;

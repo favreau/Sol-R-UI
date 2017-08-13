@@ -1341,10 +1341,6 @@ begin
 
     tsMaterial.Enabled := true;
     pgParameters.ActivePage := tsMaterial;
-    //gbIllumination.Visible := (FCurrentMaterial.innerIllumination<>0);
-    //gbBasicParameters.Visible := (FCurrentMaterial.innerIllumination=0);
-    //gbTextureIds.Visible := (FCurrentMaterial.innerIllumination=0);
-    //gbSpecularity.Visible := (FCurrentMaterial.innerIllumination=0);
   end;
 end;
 
@@ -1471,34 +1467,34 @@ begin
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,tiles,tiles,tiles);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,tiles,0,0,0);
     end;
     2: // Skymap
     begin
       primitiveId := SolR_AddPrimitive(integer(ptSphere), integer(false));
       SolR_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,1,1,0,0);
     end;
     3: // Skymap and Ground
     begin
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,tiles,tiles,tiles);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, SKYBOX_GROUND_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,tiles,0,0,0);
 
       primitiveId := SolR_AddPrimitive(integer(ptSphere), integer(false));
       SolR_SetPrimitive( primitiveId, 0, 0, 0, 0, 0, 0, 0, 0, 0, boxSize/2, boxSize/2, boxSize/2, SKYBOX_SPHERE_MATERIAL);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,1,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,1,1,0,0);
     end;
     4: // Cornell Box
     begin
@@ -1507,71 +1503,58 @@ begin
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize, groundHeight, -boxSize, boxSize, groundHeight,-boxSize, boxSize, groundHeight,  boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,0,tiles,0,tiles,tiles,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,tiles,tiles,tiles);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize, groundHeight, boxSize, -boxSize, groundHeight, boxSize, -boxSize, groundHeight,-boxSize, 0,0,0, CORNELLBOX_GROUND_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,1,0,0,1,0,0,1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,0,tiles,0,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,tiles,tiles,tiles,0,0,0);
 
       groundHeight := groundHeight+boxSize;
       // Front
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,1,0,1,1);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_FRONT_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,0,-1,0,0,-1,0,0,-1);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0);
 
       // Right
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize, boxSize, boxSize,groundHeight-boxSize,-boxSize, boxSize,groundHeight+boxSize, -boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,1,0,1,1);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, boxSize,groundHeight-boxSize, boxSize, 0,0,0, CORNELLBOX_RIGHT_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,-1,0,0,-1,0,0,-1,0,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-
-      {
-      // Back
-      primitiveId := SolR_AddPrimitive(integer(ptTriangle));
-      SolR_SetPrimitive( primitiveId, boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
-      SolR_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
-
-      primitiveId := SolR_AddPrimitive(integer(ptTriangle));
-      SolR_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_BACK_MATERIAL);
-      SolR_SetPrimitiveNormals(primitiveId,0,0,1,0,0,1,0,0,1);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
-      }
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0);
 
       // Left
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize,groundHeight-boxSize,-boxSize,-boxSize,groundHeight-boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,1,0,1,1);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize,-boxSize,groundHeight-boxSize,-boxSize, 0,0,0, CORNELLBOX_LEFT_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,1,0,0,1,0,0,1,0,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0);
 
       // Top
       // Ground
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId,-boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize,-boxSize, boxSize,groundHeight+boxSize, boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,0,1,0,0,1,1,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,0,0,1,0,1,1);
 
       primitiveId := SolR_AddPrimitive(integer(ptTriangle), integer(false));
       SolR_SetPrimitive( primitiveId, boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize, boxSize,-boxSize,groundHeight+boxSize,-boxSize, 0,0,0, CORNELLBOX_TOP_MATERIAL);
       SolR_SetPrimitiveNormals(primitiveId,0,-1,0,0,-1,0,0,-1,0);
-      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,0,1,0,0,0,0);
+      SolR_SetPrimitiveTextureCoordinates(primitiveId,1,1,0,1,0,0);
     end;
   end;
 
@@ -1787,13 +1770,6 @@ begin
   FCurrentMaterialId := SKYBOX_SPHERE_MATERIAL;
   updateMaterialControls;
   FPathTracingIteration := 0;
-  {
-  if( cdColor.Execute ) then
-  begin
-    shBackgroundColor.Brush.Color := cdColor.Color;
-    RenderScene;
-  end;
-  }
 end;
 
 procedure TmainForm.shMaterialColorMouseDown(Sender: TObject;

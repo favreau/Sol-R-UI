@@ -14296,10 +14296,6 @@ object mainForm: TmainForm
       object tsScene: TTabSheet
         Caption = 'Scene'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gb3DVision: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -14572,7 +14568,6 @@ object mainForm: TmainForm
           Align = alTop
           Caption = 'Helpers'
           TabOrder = 4
-          ExplicitTop = 404
           object cbBoundingBoxes: TCheckBox
             Left = 9
             Top = 24
@@ -14634,8 +14629,6 @@ object mainForm: TmainForm
           Align = alClient
           Caption = 'Epsilons'
           TabOrder = 5
-          ExplicitTop = 637
-          ExplicitHeight = 70
           object lblEpsilonGeometry: TLabel
             Left = 12
             Top = 24
@@ -14696,15 +14689,10 @@ object mainForm: TmainForm
             'Panoramic 360')
           TabOrder = 6
           OnClick = ResetRendering
-          ExplicitTop = 553
         end
       end
       object tsMaterial: TTabSheet
         Caption = 'Material'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object gbMaterialColor: TGroupBox
           AlignWithMargins = True
           Left = 3
@@ -14766,12 +14754,12 @@ object mainForm: TmainForm
             Height = 13
             Caption = 'Refraction:'
           end
-          object lblNoise: TLabel
+          object lblGloss: TLabel
             Left = 16
             Top = 96
-            Width = 30
+            Width = 29
             Height = 13
-            Caption = 'Noise:'
+            Caption = 'Gloss:'
           end
           object lblOpacity: TLabel
             Left = 16
@@ -15172,10 +15160,6 @@ object mainForm: TmainForm
       object tsTextures: TTabSheet
         Caption = 'Textures'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object dgTextures: TDrawGrid
           Left = 0
           Top = 0

@@ -93,7 +93,7 @@ type
     lblReflection: TLabel;
     lblTransparency: TLabel;
     lblRefraction: TLabel;
-    lblNoise: TLabel;
+    lblGloss: TLabel;
     cbProcedural: TCheckBox;
     sbReflection: TScrollBar;
     sbTransparency: TScrollBar;
